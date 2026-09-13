@@ -16,81 +16,45 @@
             <RowDefinition Height="50" />
         </Grid.RowDefinitions>
         <Grid Grid.Row="0">
-            <TabControl x:Name="tabWindowsPeCommands">
+            <!-- =========================================================
+     COMMANDES SYNCHRONES
+     ========================================================= -->
+
+            <TabControl x:Name="tabCommands">
+
+                <!-- =====================================================
+         WINDOWS PE
+         ===================================================== -->
+
                 <TabItem Header="Windows PE">
+
                     <DataGrid x:Name="gridWindowsPeCommands"
                               AutoGenerateColumns="False"
                               CanUserAddRows="False"
+                              CanUserDeleteRows="False"
                               SelectionMode="Single"
-                              BorderThickness="5"
-                              SelectionUnit="FullRow">
-
-                        <DataGrid.Columns>
-
-                            <DataGridCheckBoxColumn Header="Enabled"
-                                                    Binding="{Binding Enabled}"
-                                                    Width="75" />
-
-                            <DataGridComboBoxColumn Header="Type"
-                                                    SelectedItemBinding="{Binding Type}"
-                                                    Width="110" />
-
-                            <DataGridTextColumn Header="Order"
-                                                Binding="{Binding Order}"
-                                                Width="60" />
-
-                            <DataGridTextColumn Header="Description"
-                                                Binding="{Binding Description}"
-                                                Width="220" />
-
-                            <DataGridTextColumn Header="Command line"
-                                                Binding="{Binding CommandLine}"
-                                                Width="*" />
-
-                        </DataGrid.Columns>
-
-                    </DataGrid>
+                              SelectionUnit="FullRow" />
 
                 </TabItem>
 
+
+                <!-- =====================================================
+                     FIRST LOGON
+                     ===================================================== -->
 
                 <TabItem Header="First Logon">
 
                     <DataGrid x:Name="gridFirstLogonCommands"
                               AutoGenerateColumns="False"
                               CanUserAddRows="False"
+                              CanUserDeleteRows="False"
                               SelectionMode="Single"
-                              SelectionUnit="FullRow">
-
-                        <DataGrid.Columns>
-
-                            <DataGridCheckBoxColumn Header="Enabled"
-                                                    Binding="{Binding Enabled}"
-                                                    Width="75" />
-
-                            <DataGridComboBoxColumn Header="Type"
-                                                    SelectedItemBinding="{Binding Type}"
-                                                    Width="110" />
-
-                            <DataGridTextColumn Header="Order"
-                                                Binding="{Binding Order}"
-                                                Width="60" />
-
-                            <DataGridTextColumn Header="Description"
-                                                Binding="{Binding Description}"
-                                                Width="220" />
-
-                            <DataGridTextColumn Header="Command line"
-                                                Binding="{Binding CommandLine}"
-                                                Width="*" />
-
-                        </DataGrid.Columns>
-
-                    </DataGrid>
+                              SelectionUnit="FullRow" />
 
                 </TabItem>
 
             </TabControl>
+            
         </Grid>
         <Grid x:Name="pnlEditor"
               Grid.Row="1"
@@ -180,7 +144,7 @@
                         Content="Apply change"
                         Grid.Column="4"
                         Margin="5"
-                        VerticalAlignment="Top" Click=""/>
+                        VerticalAlignment="Top" Click="btnAddCommand_Click"/>
             </Grid>
         </Grid>
 
@@ -188,5 +152,4 @@
             <!-- Add / Remove / Up / Down / OK / Cancel -->
         </Grid>
     </Grid>
-
 </Window>

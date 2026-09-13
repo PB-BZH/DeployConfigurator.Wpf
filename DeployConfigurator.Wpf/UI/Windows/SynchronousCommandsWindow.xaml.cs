@@ -28,7 +28,6 @@
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
-using System.Windows.Media;
 using DeployConfigurator.Wpf.Core.Models;
 using PB.BZH.Help.Wpf.UI.Theming;
 
@@ -45,10 +44,11 @@ public partial class SynchronousCommandsWindow: Window {
 
     ThemeManager.SetTheme(AppTheme.Dark);
 
-    colWinPeType.ItemsSource = Enum.GetValues(typeof(SynchronousCommandType));
-    colFirstLogonType.ItemsSource = Enum.GetValues(typeof(SynchronousCommandType));
+    // ============================================================
+    // INITIALISATION DES TYPES DE COMMANDES
+    // ============================================================
 
-    cmbEditType.ItemsSource = Enum.GetValues(typeof(SynchronousCommandType));
+    cmbEditType.ItemsSource = Enum.GetValues<SynchronousCommandType>();
 
     WindowsPeCommands = CloneCommands(windowsPeCommands);
     FirstLogonCommands = CloneCommands(firstLogonCommands);
@@ -102,12 +102,13 @@ public partial class SynchronousCommandsWindow: Window {
     LoadSelectedCommandToEditor();
   }
 
+  // ============================================================
+  // COMMANDE COURANTE
+  // ============================================================
+
   private SynchronousCommandConfiguration? CurrentCommand {
     get {
-      if (CurrentGrid.CurrentRow == null)
-        return null;
-
-      int index = CurrentGrid.CurrentRow.Index;
+      int index = CurrentGrid.SelectedIndex;
 
       if (index < 0 || index >= CurrentList.Count)
         return null;
@@ -115,7 +116,6 @@ public partial class SynchronousCommandsWindow: Window {
       return CurrentList[index];
     }
   }
-
 
   private static List<SynchronousCommandConfiguration> CloneCommands(
       IEnumerable<SynchronousCommandConfiguration> source) {
@@ -129,61 +129,74 @@ public partial class SynchronousCommandsWindow: Window {
   }
 
   private static void ConfigureGrid(DataGrid grid) {
+
+    // ============================================================
+    // COMPORTEMENT DU DATAGRID
+    // ============================================================
+
     grid.AutoGenerateColumns = false;
-    grid.AllowUserToAddRows = false;
-    grid.AllowUserToDeleteRows = false;
-    grid.SelectionMode = DataGridSelectionMode.FullRowSelect;
-    grid.MultiSelect = false;
-    grid.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill;
-    grid.RowHeadersVisible = false;
+    grid.CanUserAddRows = false;
+    grid.CanUserDeleteRows = false;
 
-    grid.BackgroundColor = new SolidColorBrush(Color.FromRgb(45,45,45));
-    grid.BorderStyle = BorderStyle.None;
-    grid.GridColor = new SolidColorBrush(Color.FromRgb(80,80,80));
+    grid.SelectionMode = DataGridSelectionMode.Single;
+    grid.SelectionUnit = DataGridSelectionUnit.FullRow;
+    grid.HeadersVisibility = DataGridHeadersVisibility.Column;
 
-    grid.EnableHeadersVisualStyles = false;
-    grid.ColumnHeadersDefaultCellStyle.BackColor = new SolidColorBrush(Color.FromRgb(35,35,35));
-    grid.ColumnHeadersDefaultCellStyle.Foreground = Brushes.White;
-    grid.ColumnHeadersDefaultCellStyle.SelectionBackColor = new SolidColorBrush(Color.FromRgb(35,35,35));
-    grid.ColumnHeadersDefaultCellStyle.SelectionForeColor = Brushes.White;
-
-    grid.DefaultCellStyle.BackColor = new SolidColorBrush(Color.FromRgb(45,45,45));
-    grid.DefaultCellStyle.Foreground = Brushes.White;
-    grid.DefaultCellStyle.SelectionBackColor = new SolidColorBrush(Color.FromRgb(0,120,215));
-    grid.DefaultCellStyle.SelectionForeColor = Brushes.White;
+    // ============================================================
+    // COLONNES
+    // ============================================================
 
     grid.Columns.Clear();
 
+    // Enabled
     grid.Columns.Add(new DataGridCheckBoxColumn {
-      Binding = new Binding("Enabled"),
       Header = "Enabled",
-      Width = 70,
+      Binding =
+          new Binding("Enabled") {
+            Mode = BindingMode.TwoWay,
+            UpdateSourceTrigger = UpdateSourceTrigger.PropertyChanged
+          },
+      Width = 70
     });
 
+    // Type
     grid.Columns.Add(new DataGridComboBoxColumn {
       Header = "Type",
       ItemsSource = Enum.GetValues<SynchronousCommandType>(),
-      SelectedItemBinding = new Binding("Type") {
-        Mode = BindingMode.TwoWay,
-        UpdateSourceTrigger = UpdateSourceTrigger.PropertyChanged
-      },
+      SelectedItemBinding =
+          new Binding("Type") {
+            Mode = BindingMode.TwoWay,
+            UpdateSourceTrigger = UpdateSourceTrigger.PropertyChanged
+          },
       Width = 110
     });
 
+    // Order
     grid.Columns.Add(new DataGridTextColumn {
-      Binding = new Binding("Order"),
       Header = "Order",
-      Width = 60,
+      Binding = new Binding("Order") {
+        Mode = BindingMode.TwoWay
+      },
+      Width = 60
     });
 
+    // Description
     grid.Columns.Add(new DataGridTextColumn {
-      Binding = new Binding("Description"),
       Header = "Description",
+      Binding = new Binding("Description") {
+        Mode = BindingMode.TwoWay
+      },
+      Width = new DataGridLength(1,DataGridLengthUnitType.Star)
     });
 
+    // Command line
     grid.Columns.Add(new DataGridTextColumn {
-      Binding = new Binding("CommandLine"),
       Header = "Command line",
+      Binding = new Binding("CommandLine") {
+        Mode = BindingMode.TwoWay
+      },
+
+      Width = new DataGridLength(2,DataGridLengthUnitType.Star)
     });
   }
 
@@ -195,17 +208,26 @@ public partial class SynchronousCommandsWindow: Window {
     gridFirstLogonCommands.ItemsSource = FirstLogonCommands;
   }
 
+  // ============================================================
+  // ONGLET COURANT
+  // ============================================================
+
   private DataGrid CurrentGrid =>
-      tabCommands.SelectedItem == tabWindowsPeCommands
+      tabCommands.SelectedIndex == 0
           ? gridWindowsPeCommands
           : gridFirstLogonCommands;
 
   private List<SynchronousCommandConfiguration> CurrentList =>
-      tabCommands.SelectedTab == tabWindowsPeCommands
+      tabCommands.SelectedIndex == 1
           ? WindowsPeCommands
           : FirstLogonCommands;
 
+  // ============================================================
+  // AJOUT D'UNE COMMANDE
+  // ============================================================
+
   private void btnAddCommand_Click(object? sender,RoutedEventArgs e) {
+
     int nextOrder = CurrentList.Count == 0
         ? 1
         : CurrentList.Max(x => x.Order) + 1;
@@ -220,25 +242,39 @@ public partial class SynchronousCommandsWindow: Window {
 
     LoadGrids();
     SelectRow(CurrentGrid,CurrentList.Count - 1);
+
     CommandsChanged?.Invoke();
   }
 
   private void btnRemoveCommand_Click(object? sender,RoutedEventArgs e) {
-    if (CurrentGrid.CurrentRow == null)
+
+    // ============================================================
+    // LIGNE SÉLECTIONNÉE
+    // ============================================================
+
+    if (CurrentGrid.SelectedItem == null)
       return;
-
-    int index = CurrentGrid.CurrentRow.Index;
-
+    int index = CurrentGrid.SelectedIndex;
     if (index < 0 || index >= CurrentList.Count)
       return;
 
+
+    // ============================================================
+    // SUPPRESSION
+    // ============================================================
+
     CurrentList.RemoveAt(index);
     Renumber(CurrentList);
-
     LoadGrids();
+
+
+    // ============================================================
+    // RESTAURATION DE LA SÉLECTION
+    // ============================================================
 
     if (CurrentList.Count > 0)
       SelectRow(CurrentGrid,Math.Min(index,CurrentList.Count - 1));
+
     CommandsChanged?.Invoke();
   }
 

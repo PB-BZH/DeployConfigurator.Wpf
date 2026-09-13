@@ -128,6 +128,39 @@ public partial class MainWindow: Window {
     }
   }
 
+  // ============================================================
+  // OUVERTURE D'UN APERÇU DANS NOTEPAD++
+  // ============================================================
+
+  private void Preview_OpenInNotepadPlusPlusRequested(object? sender,EventArgs e) {
+
+    if (sender is not PreviewEditor preview)
+      return;
+
+    string fileName;
+
+    if (preview == previewDiskPrep)
+      fileName = "diskprep.cmd";
+    else if (preview == previewSetupComplete)
+      fileName = "SetupComplete.cmd";
+    else if (preview == previewOrchestrator_resume)
+      fileName = "Orchestrator_resume.cmd";
+    else if (preview == previewAutoUnattend)
+      fileName = "autounattend.xml";
+    else if (preview == previewUnattend)
+      fileName = "unattend.xml";
+    else if (preview == previewProfileDeployJson)
+      fileName = "profile.deploy.json";
+    else if (preview == previewprofileBuildReport)
+      fileName = "BuildReport.txt";
+    else if (preview == previewBuildLog)
+      fileName = "BuildLog.txt";
+    else
+      return;
+
+    OpenTextInNotepadPlusPlus(GetRichText(preview.Editor),fileName);
+  }
+
   private void DarkTheme() {
 
     ThemeManager.SetTheme(

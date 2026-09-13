@@ -1513,53 +1513,89 @@
                     ScrollViewer.HorizontalScrollBarVisibility="Auto"
                     Grid.Row="3"
                     d:LayoutOverrides="VerticalAlignment">
+
+            <!-- =========================================================
+         DISKPREP
+         ========================================================= -->
+
             <TabItem Header="diskprep.cmd">
                 <controls:PreviewEditor x:Name="previewDiskPrep"
                                         EditorMouseDoubleClick="txtPreview_DoubleClick"
-                                        OpenInNotepadPlusPlusRequested="PreviewDiskPrep_OpenInNotepadPlusPlusRequested" />
+                                        OpenInNotepadPlusPlusRequested="Preview_OpenInNotepadPlusPlusRequested" />
             </TabItem>
+
+            <!-- =========================================================
+         SETUPCOMPLETE
+         ========================================================= -->
+
             <TabItem Header="SetupComplete.cmd">
                 <controls:PreviewEditor x:Name="previewSetupComplete"
                                         EditorMouseDoubleClick="txtPreview_DoubleClick"
-                                        OpenInNotepadPlusPlusRequested="previewSetupComplete_OpenInNotepadPlusPlusRequested" />
+                                        OpenInNotepadPlusPlusRequested="Preview_OpenInNotepadPlusPlusRequested" />
             </TabItem>
+
+            <!-- =========================================================
+         ORCHESTRATOR
+         ========================================================= -->
 
             <TabItem Header="Orchestrator_resume.cmd">
                 <controls:PreviewEditor x:Name="previewOrchestrator_resume"
                                         EditorMouseDoubleClick="txtPreview_DoubleClick"
-                                        OpenInNotepadPlusPlusRequested="PreviewDiskPrep_OpenInNotepadPlusPlusRequested" />
+                                        OpenInNotepadPlusPlusRequested="Preview_OpenInNotepadPlusPlusRequested" />
             </TabItem>
+
+            <!-- =========================================================
+         AUTOUNATTEND
+         ========================================================= -->
 
             <TabItem Header="autounattend.xml">
                 <controls:PreviewEditor x:Name="previewAutoUnattend"
                                         EditorMouseDoubleClick="txtPreview_DoubleClick"
-                                        OpenInNotepadPlusPlusRequested="previewOrchestrator_resume_OpenInNotepadPlusPlusRequested" />
+                                        OpenInNotepadPlusPlusRequested="Preview_OpenInNotepadPlusPlusRequested" />
             </TabItem>
+
+            <!-- =========================================================
+         UNATTEND
+         ========================================================= -->
 
             <TabItem Header="unattend.xml">
                 <controls:PreviewEditor x:Name="previewUnattend"
                                         EditorMouseDoubleClick="txtPreview_DoubleClick"
-                                        OpenInNotepadPlusPlusRequested="previewUnattend_OpenInNotepadPlusPlusRequested" />
+                                        OpenInNotepadPlusPlusRequested="Preview_OpenInNotepadPlusPlusRequested" />
             </TabItem>
+
+            <!-- =========================================================
+         PROFILE
+         ========================================================= -->
 
             <TabItem Header="profile.deploy.json">
                 <controls:PreviewEditor x:Name="previewProfileDeployJson"
                                         EditorMouseDoubleClick="txtPreview_DoubleClick"
-                                        OpenInNotepadPlusPlusRequested="previewProfileDeployJson_OpenInNotepadPlusPlusRequested" />
+                                        OpenInNotepadPlusPlusRequested="Preview_OpenInNotepadPlusPlusRequested" />
             </TabItem>
+
+            <!-- =========================================================
+         BUILD REPORT
+         ========================================================= -->
 
             <TabItem Header="Build report">
                 <controls:PreviewEditor x:Name="previewprofileBuildReport"
                                         EditorMouseDoubleClick="txtPreview_DoubleClick"
-                                        OpenInNotepadPlusPlusRequested="previewprofileBuildReport_OpenInNotepadPlusPlusRequested" />
+                                        OpenInNotepadPlusPlusRequested="Preview_OpenInNotepadPlusPlusRequested" />
             </TabItem>
+
+            <!-- =========================================================
+         BUILD LOG
+         ========================================================= -->
 
             <TabItem Header="Build Log">
                 <controls:PreviewEditor x:Name="previewBuildLog"
                                         EditorMouseDoubleClick="txtPreview_DoubleClick"
-                                        OpenInNotepadPlusPlusRequested="previewprofileBuildReport_OpenInNotepadPlusPlusRequested" />
+                                        OpenInNotepadPlusPlusRequested="Preview_OpenInNotepadPlusPlusRequested" />
             </TabItem>
+
         </TabControl>
+        
         <StatusBar x:Name="statusStrip"
                    Grid.Row="4"
                    Grid.ColumnSpan="5"

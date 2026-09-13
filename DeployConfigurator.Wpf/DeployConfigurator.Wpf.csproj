@@ -19,6 +19,11 @@
 		<InformationalVersion>1.0.0</InformationalVersion>
 
 	</PropertyGroup>
+	<ItemGroup>
+		<Content Include="Templates\**\*.*">
+			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+		</Content>
+	</ItemGroup>
 
 	<ItemGroup>
 	  <Compile Remove="MainWindow.xaml.cs.old.cs" />
