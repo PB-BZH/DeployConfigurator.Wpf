@@ -1106,7 +1106,7 @@
                             Grid.Row="0"
                             Width="32"
                             Height="25"
-                            Click="btnBrowseWindowsIsoPath_Click" />
+                            Click="btnBrowseWindowsIso_Click" />
 
                     <Label x:Name="lblMediaWorkingDirectory"
                            Grid.Column="0"

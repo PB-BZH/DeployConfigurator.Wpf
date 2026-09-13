@@ -1351,11 +1351,6 @@ public partial class MainWindow: Window {
   private void btnBrowseDriversSourcePath_Click(object sender,RoutedEventArgs e) {
     BrowseFolderInto(txtDriversSourcePath);
   }
-
-  private void btnBrowseWindowsIsoPath_Click(object sender,RoutedEventArgs e) {
-    BrowseFolderInto(txtWindowsIsoPath);
-  }
-
   private void btnBrowseMediaWorkingDirectory_Click(object sender,RoutedEventArgs e) {
     BrowseFolderInto(txtMediaWorkingDirectory);
   }
@@ -3327,16 +3322,21 @@ public partial class MainWindow: Window {
     });
   }
 
-  private void btnBrowseWindowsIso_Click(object sender,EventArgs e) {
+  // ============================================================
+  // SÉLECTION DE L'ISO WINDOWS
+  // ============================================================
+
+  private void btnBrowseWindowsIso_Click(object sender,RoutedEventArgs e) {
+
     OpenFileDialog dialog = new() {
       Filter = "ISO files (*.iso)|*.iso",
-      Title = "Select Windows ISO"
+      Title = "Select Windows ISO",
+      CheckFileExists = true,
+      Multiselect = false
     };
 
-    if (dialog.ShowDialog() == true) {
+    if (dialog.ShowDialog(this) == true)
       txtWindowsIsoPath.Text = dialog.FileName;
-    }
-    Owner = this;
   }
 
   private void LoadKeyboardLocales() {
