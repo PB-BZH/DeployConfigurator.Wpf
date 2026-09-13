@@ -1,0 +1,77 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+	<PropertyGroup>
+		<OutputType>WinExe</OutputType>
+		<TargetFramework>net10.0-windows</TargetFramework>
+		<Nullable>enable</Nullable>
+		<ImplicitUsings>enable</ImplicitUsings>
+		<UseWPF>true</UseWPF>
+		<ApplicationIcon>Ressources\Applicaton.ico</ApplicationIcon>
+		<PackageIcon>Application.png</PackageIcon>
+		<Product>Deploy Configurator WPF</Product>
+		<Company>PB BZH Concept</Company>
+		<Copyright>Copyright © 2026 PB BZH Concept</Copyright>
+		<Version>1.0.0</Version>
+		<Description>Framework de configuration de déploiement Windows automatisé</Description>
+		<IncludeSourceRevisionInInformationalVersion>false</IncludeSourceRevisionInInformationalVersion>
+		<AssemblyVersion>1.0.0.0</AssemblyVersion>
+		<FileVersion>1.0.0.0</FileVersion>
+		<InformationalVersion>1.0.0</InformationalVersion>
+
+	</PropertyGroup>
+
+	<ItemGroup>
+	  <Compile Remove="MainWindow.xaml.cs.old.cs" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<Content Include="Ressources\Applicaton.ico" />
+	</ItemGroup>
+
+	<ItemGroup>
+	  <None Include="MainWindow.xaml.cs.old.cs" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<PackageReference Include="System.Management" Version="10.0.12" />
+	</ItemGroup>
+
+
+	<ItemGroup>
+		<Reference Include="PB.BZH.Help.Core">
+			<HintPath>..\..\PB.BZH.Help.Core\PB.BZH.Help.Core\bin\Release\net10.0-windows\PB.BZH.Help.Core.dll</HintPath>
+		</Reference>
+		<Reference Include="PB.BZH.Help.Wpf">
+			<HintPath>..\..\PB.BZH.Help.Wpf\PB.BZH.Help.Wpf\bin\Release\net10.0-windows\PB.BZH.Help.Wpf.dll</HintPath>
+		</Reference>
+		<Reference Include="PB.BZH.Licensing.Core">
+			<HintPath>..\..\PB.BZH.Licensing.Core\PB.BZH.Licensing.Core\bin\Release\net10.0-windows\PB.BZH.Licensing.Core.dll</HintPath>
+		</Reference>
+		<Reference Include="PB.BZH.Licensing.Wpf">
+			<HintPath>..\..\PB.BZH.Licensing.Wpf\PB.BZH.Licensing.Wpf\bin\Release\net10.0-windows\PB.BZH.Licensing.Wpf.dll</HintPath>
+		</Reference>
+	</ItemGroup>
+
+	<ItemGroup>
+		<Compile Update="Properties\Resources.Designer.cs">
+			<DesignTime>True</DesignTime>
+			<AutoGen>True</AutoGen>
+			<DependentUpon>Resources.resx</DependentUpon>
+		</Compile>
+	</ItemGroup>
+
+	<ItemGroup>
+		<EmbeddedResource Update="Properties\Resources.resx">
+			<Generator>ResXFileCodeGenerator</Generator>
+			<LastGenOutput>Resources.Designer.cs</LastGenOutput>
+		</EmbeddedResource>
+	</ItemGroup>
+
+	<ItemGroup>
+		<None Update="Ressources\Application.png">
+			<Pack>True</Pack>
+			<PackagePath>\</PackagePath>
+		</None>
+	</ItemGroup>
+
+</Project>

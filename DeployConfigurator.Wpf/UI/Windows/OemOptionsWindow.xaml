@@ -1,0 +1,314 @@
+<Window x:Class="DeployConfigurator.Wpf.UI.Windows.OemOptionsWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:DeployConfigurator.Wpf.UI.Windows"
+        xmlns:controls="clr-namespace:DeployConfigurator.Wpf.UI.Controls"
+        mc:Ignorable="d"
+        Title="OemOptionsWindow"
+        Height="380"
+        Width="750">
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="*" />
+            <RowDefinition Height="60" />
+        </Grid.RowDefinitions>
+        <Grid Grid.Row="0">
+            <TabControl x:Name="TabMain"
+                        BorderThickness="3">
+                <TabItem Header="OEM Information" >
+                    <Grid Margin="10">
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="32" />
+                            <RowDefinition Height="Auto" />
+                        </Grid.RowDefinitions>
+                        <!-- OEM Information -->
+                        <Grid Grid.Row="0">
+                            <CheckBox x:Name="chkEnableOemInformation"
+                                      Content="Enable OEM information"
+                                      VerticalAlignment="Center" />
+
+                        </Grid>
+                        <Grid Grid.Row="1"
+                              Margin="20,0,20,0">
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="32" />
+                                <RowDefinition Height="32" />
+                                <RowDefinition Height="32" />
+                                <RowDefinition Height="32" />
+                                <RowDefinition Height="32" />
+                                <RowDefinition Height="32" />
+                                <RowDefinition Height="32" />
+                            </Grid.RowDefinitions>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="120" />
+                                <ColumnDefinition Width="10" />
+                                <ColumnDefinition Width="*" />
+                            </Grid.ColumnDefinitions>
+
+                            <CheckBox x:Name="chkUseManufacturer"
+                                      Content="Manufacturer"
+                                      Grid.Row="0"
+                                      Grid.Column="0"
+                                      VerticalAlignment="Center" />
+
+                            <TextBox x:Name="txtManufacturer"
+                                     Grid.Row="0"
+                                     Grid.Column="2"
+                                     Height="25"
+                                     VerticalAlignment="Center" />
+
+                            <CheckBox x:Name="chkUseModel"
+                                      Content="Model"
+                                      Grid.Row="1"
+                                      Grid.Column="0"
+                                      VerticalAlignment="Center" />
+
+                            <TextBox x:Name="txtModel"
+                                     Grid.Row="1"
+                                     Grid.Column="2"
+                                     Height="25"
+                                     VerticalAlignment="Center" />
+
+                            <CheckBox x:Name="chkUseSupportAppUrl"
+                                      Content="Support App Url"
+                                      Grid.Row="2"
+                                      Grid.Column="0"
+                                      VerticalAlignment="Center" />
+
+                            <TextBox x:Name="txtSupportAppUrl"
+                                     Grid.Row="2"
+                                     Grid.Column="2"
+                                     Height="25"
+                                     VerticalAlignment="Center" />
+
+                            <CheckBox x:Name="chkUseSupportUrl"
+                                      Content="Support URL"
+                                      Grid.Row="3"
+                                      Grid.Column="0"
+                                      VerticalAlignment="Center" />
+
+                            <TextBox x:Name="txtSupportUrl"
+                                     Grid.Row="3"
+                                     Grid.Column="2"
+                                     Height="25"
+                                     VerticalAlignment="Center" />
+
+                            <CheckBox x:Name="chkUseSupportHours"
+                                      Content="Support hours"
+                                      Grid.Row="4"
+                                      Grid.Column="0"
+                                      VerticalAlignment="Center" />
+
+                            <TextBox x:Name="txtSupportHours"
+                                     Grid.Row="4"
+                                     Grid.Column="2"
+                                     Height="25"
+                                     VerticalAlignment="Center" />
+
+                            <CheckBox x:Name="chkUseSupportProvider"
+                                      Content="Support Provider"
+                                      Grid.Row="5"
+                                      Grid.Column="0"
+                                      VerticalAlignment="Center" />
+
+                            <TextBox x:Name="txtSupportProvider"
+                                     Grid.Row="5"
+                                     Grid.Column="2"
+                                     Height="25"
+                                     VerticalAlignment="Center" />
+
+                            <CheckBox x:Name="chkUseSupportPhone"
+                                      Content="Support phone"
+                                      Grid.Row="6"
+                                      Grid.Column="0"
+                                      VerticalAlignment="Center" />
+
+                            <TextBox x:Name="txtSupportPhone"
+                                     Grid.Row="6"
+                                     Grid.Column="2"
+                                     Height="25"
+                                     VerticalAlignment="Center" />
+
+                        </Grid>
+                    </Grid>
+                </TabItem>
+                <TabItem Header="Assets">
+                    <!-- Logo + Wallpaper -->
+                    <Grid>
+                        <Grid Margin="10">
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="*" />
+                            </Grid.RowDefinitions>
+                            <!-- OEM Information -->
+                            <Grid Grid.Row="0">
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="32" />
+                                    <RowDefinition Height="32" />
+                                    <RowDefinition Height="32" />
+                                    <RowDefinition Height="32" />
+                                    <RowDefinition Height="32" />
+                                    <RowDefinition Height="*" />
+                                </Grid.RowDefinitions>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="120" />
+                                    <ColumnDefinition Width="10" />
+                                    <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="10" />
+                                    <ColumnDefinition Width="32" />
+                                </Grid.ColumnDefinitions>
+
+                                <CheckBox x:Name="chkEnableLogo"
+                                          Grid.Row="0"
+                                          Grid.Column="0"
+                                          Grid.ColumnSpan="3"
+                                          Content="Enable OEM logo"
+                                          VerticalAlignment="Center" />
+
+                                <Label x:Name="lblLogoPath"
+                                       Content="Logo path"
+                                          Grid.Row="1"
+                                          Grid.Column="0"
+                                          VerticalAlignment="Center" />
+
+                                <TextBox x:Name="txtLogoPath"
+                                         Grid.Row="1"
+                                         Grid.Column="2"
+                                         Height="25"
+                                         VerticalAlignment="Center" />
+
+                                <Button x:Name="btnBrowseLogo"
+                                        Grid.Row="1"
+                                        Grid.Column="4"
+                                        Content="..."
+                                        Width="32"
+                                        Height="25"
+                                        VerticalAlignment="Center"
+                                        Click="btnBrowseLogo_Click" />
+
+                                <CheckBox x:Name="chkEnableWallpaper"
+                                          Grid.Row="3"
+                                          Grid.Column="0"
+                                          Grid.ColumnSpan="3"
+                                          Content="Enable wallpaper"
+                                          VerticalAlignment="Center" />
+
+                                <Label x:Name="lblWallpaperPath"
+                                       Content="Wallpaper path"
+                                          Grid.Row="4"
+                                          Grid.Column="0"
+                                          VerticalAlignment="Center" />
+
+                                <TextBox x:Name="txtWallpaperPath"
+                                         Grid.Row="4"
+                                         Grid.Column="2"
+                                         Height="25"
+                                         VerticalAlignment="Center" />
+
+                                <Button x:Name="btnBrowseWallpaper"
+                                        Grid.Row="4"
+                                        Grid.Column="4"
+                                        Content="..."
+                                        Width="32"
+                                        Height="25"
+                                        VerticalAlignment="Center"
+                                        Click="btnBrowseWallpaper_Click" />
+                            </Grid>
+                        </Grid>
+                    </Grid>
+                </TabItem>
+
+                <TabItem Header="OOBE">
+                         <!-- OOBE options -->
+                    <Grid Margin="20">
+                        <Grid Grid.Row="0">
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="32" />
+                                <RowDefinition Height="32" />
+                                <RowDefinition Height="32" />
+                                <RowDefinition Height="32" />
+                                <RowDefinition Height="32" />
+                                <RowDefinition Height="*" />
+                            </Grid.RowDefinitions>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="120" />
+                                <ColumnDefinition Width="10" />
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="10" />
+                                <ColumnDefinition Width="32" />
+                            </Grid.ColumnDefinitions>
+
+                            <CheckBox x:Name="chkHideEulaPage"
+                                      Grid.Row="0"
+                                      Grid.Column="0"
+                                      Grid.ColumnSpan="3"
+                                      Content="Hide EULA page"
+                                      VerticalAlignment="Center" />
+
+
+                            <CheckBox x:Name="chkHideOnlineAccountScreens"
+                                      Grid.Row="1"
+                                      Grid.Column="0"
+                                      Grid.ColumnSpan="3"
+                                      Content="Hide online account screens"
+                                      VerticalAlignment="Center" />
+
+                            <CheckBox x:Name="chkHideOEMRegistrationScreen"
+                                      Grid.Row="2"
+                                      Grid.Column="0"
+                                      Grid.ColumnSpan="3"
+                                      Content="Hide OEM registration screen"
+                                      VerticalAlignment="Center" />
+
+
+                            <CheckBox x:Name="chkHideWirelessSetupInOobe"
+                                      Grid.Row="3"
+                                      Grid.Column="0"
+                                      Grid.ColumnSpan="3"
+                                      Content="Hide wireless setup"
+                                      VerticalAlignment="Center" />
+
+                            <Label x:Name="lblProtectYourPc"
+                                   Grid.Row="4"
+                                   Grid.Column="0"
+                                   Content="Protect Your PC:"
+                                   VerticalContentAlignment="Center" />
+
+                            <controls:NumericUpDown x:Name="numProtectYourPc"
+                                                    Grid.Row="4"
+                                                    Grid.Column="2"
+                                                    Value="1"
+                                                    Minimum="1"
+                                                    Maximum="3"
+                                                    Increment="1"
+                                                    HorizontalAlignment="Left" />
+
+                        </Grid>
+                    </Grid>
+                </TabItem>
+            </TabControl>
+        </Grid>
+        <Grid Grid.Row="1">
+            <StackPanel Orientation="Horizontal"
+                        HorizontalAlignment="Center"
+                        VerticalAlignment="Center">
+                <Button x:Name="btnOk"
+                        Content="OK"
+                        IsDefault="True"
+                        Height="28"
+                        Width="80"
+                        Margin="0,0,5,0"
+                        Click="btnOk_Click" />
+
+                <Button x:Name="btnCancel"
+                        Content="Cancel"
+                        IsCancel="True"
+                        Height="28"
+                        Width="80"
+                        Margin="5,0,0,0"
+                        Click="btnCancel_Click" />
+            </StackPanel>
+        </Grid>
+    </Grid>
+</Window>

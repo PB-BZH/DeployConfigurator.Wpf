@@ -1,0 +1,188 @@
+<Window x:Class="DeployConfigurator.Wpf.UI.Windows.UsbTargetConfirmWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:DeployConfigurator.Wpf.UI.Windows"
+        mc:Ignorable="d"
+        Title="USB Target Confirmation"
+        Height="300"
+        Width="600">
+    <Grid Margin="10">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="32" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+        </Grid.RowDefinitions>
+
+        <Grid Grid.Row="0">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="150" />
+                <ColumnDefinition Width="10" />
+                <ColumnDefinition Width="*" />
+            </Grid.ColumnDefinitions>
+
+            <Label Content="Select device"
+                   VerticalAlignment="Center"
+                   Grid.Column="0" />
+
+            <ComboBox x:Name="cmbUsbDevices"
+                      Grid.Column="2"
+                      Height="25" />
+        </Grid>
+
+        <Grid Grid.Row="1">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="32" />
+                <RowDefinition Height="32" />
+                <RowDefinition Height="32" />
+            </Grid.RowDefinitions>
+
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="100" />
+                <ColumnDefinition Width="10" />
+                <ColumnDefinition Width="150" />
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="100" />
+                <ColumnDefinition Width="10" />
+                <ColumnDefinition Width="150" />
+            </Grid.ColumnDefinitions>
+
+            <Label Grid.Row="0"
+                   Grid.Column="0"
+                   Content="Media profile:"
+                   VerticalAlignment="Center" />
+
+            <ComboBox x:Name="cmbMediaProfil"
+                      Grid.Row="0"
+                      Grid.Column="2"
+                      SelectedIndex="1"
+                      Height="25">
+                <ComboBoxItem Content="Microsoft Setup" />
+                <ComboBoxItem Content="OEM Deploy" />
+                <ComboBoxItem Content="Recovery Media" />
+                <ComboBoxItem Content="Technician Media" />
+            </ComboBox>
+
+            <Label Grid.Row="0"
+                   Grid.Column="4"
+                   Content="Partition type:"
+                   VerticalAlignment="Center" />
+
+            <ComboBox x:Name="cmbPartitionType"
+                      Grid.Row="0"
+                      Grid.Column="6"
+                      Height="25">
+                <ComboBoxItem Content="MBR (BIOS/CSM)" />
+                <ComboBoxItem Content="GPT (UEFI)" />
+            </ComboBox>
+
+            <Label Grid.Row="1"
+                   Grid.Column="0"
+                   Content="Volume name :"
+                   VerticalAlignment="Center" />
+
+            <TextBox x:Name="txtVolumeName"
+                     Grid.Row="1"
+                     Grid.Column="2"
+                     VerticalAlignment="Center"
+                     Height="25" />
+
+            <Label Grid.Row="1"
+                   Grid.Column="4"
+                   Content="Files system:"
+                   VerticalAlignment="Center" />
+
+            <ComboBox x:Name="cmbSystemFiles"
+                      Grid.Row="1"
+                      Grid.Column="6"
+                      SelectedIndex="1"
+                      Height="25">
+                <ComboBoxItem Content="NTFS" />
+                <ComboBoxItem Content="FAT32" />
+                <ComboBoxItem Content="exFAT" />
+            </ComboBox>
+
+            <Label Grid.Row="2"
+                   Grid.Column="0"
+                   Content="Target system :"
+                   VerticalAlignment="Center" />
+
+            <ComboBox x:Name="cmbTargetSystem"
+                      Grid.Row="2"
+                      Grid.Column="2"
+                      SelectedIndex="0"
+                      Height="25">
+                <ComboBoxItem Content="UEFI" />
+                <ComboBoxItem Content="BIOS-CSM" />
+                <ComboBoxItem Content="UEFI + BIOS" />
+            </ComboBox>
+
+            <CheckBox x:Name="chkSplitWimIfNeeded"
+                      Content="Split install.wim if necessary"
+                      Grid.Row="2"
+                      Grid.Column="4"
+                      Grid.ColumnSpan="3"
+                      VerticalAlignment="Center" />
+        </Grid>
+
+        <GroupBox Grid.Row="2"
+                  Header="Summary">
+
+            <TextBlock x:Name="txtSummary"
+                       Margin="5"
+                       TextWrapping="Wrap" />
+
+        </GroupBox>
+        <Grid Grid.Row="3">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="10" />
+                <ColumnDefinition Width="*" />
+            </Grid.ColumnDefinitions>
+
+            <Label x:Name="lblWarning"
+                Grid.Column="0"
+                   Width="auto"
+                   HorizontalAlignment="Center"
+                   VerticalAlignment="Center"
+                   Padding="0">
+
+                <TextBlock TextAlignment="Center"
+                           FontWeight="Bold">
+
+                    <Run Text="WARNING:" />
+                    <LineBreak />
+                    <Run Text="The next step will format the selected drive." />
+
+                </TextBlock>
+            </Label>
+
+            <StackPanel Grid.Column="2"
+                        Orientation="Horizontal"
+                        HorizontalAlignment="Center">
+                
+                <Button x:Name="btnOk"
+                        Content="OK"
+                        Width="80"
+                        Height="25"
+                        Margin="5"
+                        VerticalAlignment="Center"
+                        IsDefault="True"
+                        Click="btnOk_Click" />
+
+                <Button x:Name="btnCancel"
+                        Content="Cancel"
+                        Width="80"
+                        Height="25"
+                        Margin="5"
+                        VerticalAlignment="Center"
+                        IsCancel="True" />
+                
+            </StackPanel>
+                        
+        </Grid>
+
+    </Grid>
+</Window>

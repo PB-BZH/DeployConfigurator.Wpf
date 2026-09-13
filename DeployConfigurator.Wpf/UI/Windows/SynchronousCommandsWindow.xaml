@@ -1,0 +1,192 @@
+<Window x:Class="DeployConfigurator.Wpf.UI.Windows.SynchronousCommandsWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:DeployConfigurator.Wpf.UI.Windows"
+        xmlns:controls="clr-namespace:DeployConfigurator.Wpf.UI.Controls"
+        mc:Ignorable="d"
+        Title="Synchronous Commands"
+        Height="550"
+        Width="1000">
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="300" />
+            <RowDefinition Height="*" />
+            <RowDefinition Height="50" />
+        </Grid.RowDefinitions>
+        <Grid Grid.Row="0">
+            <TabControl x:Name="tabWindowsPeCommands">
+                <TabItem Header="Windows PE">
+                    <DataGrid x:Name="gridWindowsPeCommands"
+                              AutoGenerateColumns="False"
+                              CanUserAddRows="False"
+                              SelectionMode="Single"
+                              BorderThickness="5"
+                              SelectionUnit="FullRow">
+
+                        <DataGrid.Columns>
+
+                            <DataGridCheckBoxColumn Header="Enabled"
+                                                    Binding="{Binding Enabled}"
+                                                    Width="75" />
+
+                            <DataGridComboBoxColumn Header="Type"
+                                                    SelectedItemBinding="{Binding Type}"
+                                                    Width="110" />
+
+                            <DataGridTextColumn Header="Order"
+                                                Binding="{Binding Order}"
+                                                Width="60" />
+
+                            <DataGridTextColumn Header="Description"
+                                                Binding="{Binding Description}"
+                                                Width="220" />
+
+                            <DataGridTextColumn Header="Command line"
+                                                Binding="{Binding CommandLine}"
+                                                Width="*" />
+
+                        </DataGrid.Columns>
+
+                    </DataGrid>
+
+                </TabItem>
+
+
+                <TabItem Header="First Logon">
+
+                    <DataGrid x:Name="gridFirstLogonCommands"
+                              AutoGenerateColumns="False"
+                              CanUserAddRows="False"
+                              SelectionMode="Single"
+                              SelectionUnit="FullRow">
+
+                        <DataGrid.Columns>
+
+                            <DataGridCheckBoxColumn Header="Enabled"
+                                                    Binding="{Binding Enabled}"
+                                                    Width="75" />
+
+                            <DataGridComboBoxColumn Header="Type"
+                                                    SelectedItemBinding="{Binding Type}"
+                                                    Width="110" />
+
+                            <DataGridTextColumn Header="Order"
+                                                Binding="{Binding Order}"
+                                                Width="60" />
+
+                            <DataGridTextColumn Header="Description"
+                                                Binding="{Binding Description}"
+                                                Width="220" />
+
+                            <DataGridTextColumn Header="Command line"
+                                                Binding="{Binding CommandLine}"
+                                                Width="*" />
+
+                        </DataGrid.Columns>
+
+                    </DataGrid>
+
+                </TabItem>
+
+            </TabControl>
+        </Grid>
+        <Grid x:Name="pnlEditor"
+              Grid.Row="1"
+              Margin="20">
+            <!-- Order / Enabled / Type / Description / Command line -->
+            <Grid.RowDefinitions>
+                <RowDefinition Height="32" />
+                <RowDefinition Height="32" />
+                <RowDefinition Height="*" />
+            </Grid.RowDefinitions>
+
+            <Grid Grid.Row="0">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="100" />
+                    <ColumnDefinition Width="10" />
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="40" />
+                    <ColumnDefinition Width="80" />
+                    <ColumnDefinition Width="10" />
+                    <ColumnDefinition Width="50" />
+                    <ColumnDefinition Width="10" />
+                    <ColumnDefinition Width="150" />
+                    <ColumnDefinition Width="*" />
+                </Grid.ColumnDefinitions>
+                <Label x:Name="lblEditOrder"
+                       Content="Order"
+                       Grid.Column="0"
+                       VerticalAlignment="Center" />
+
+                <controls:NumericUpDown x:Name="numEditOrder"
+                                        Grid.Column="2"
+                                        Value="1"
+                                        Minimum="1"
+                                        Maximum="99"
+                                        Increment="1"
+                                        HorizontalAlignment="Left" />
+
+                <CheckBox x:Name="chkEditEnabled"
+                          Content="Enable"
+                          Grid.Column="4"
+                          VerticalAlignment="Center" />
+
+                <Label x:Name="lblEditType"
+                       Content="Type"
+                       Grid.Column="6"
+                       VerticalAlignment="Center" />
+
+                <ComboBox x:Name="cmbEditType"
+                          Grid.Column="8"
+                          Height="25" />
+            </Grid>
+            <Grid Grid.Row="1">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="120" />
+                    <ColumnDefinition Width="10" />
+                    <ColumnDefinition Width="*" />
+                </Grid.ColumnDefinitions>
+                <Label x:Name="lblEditDescription"
+                       Grid.Column="0"
+                       Content="Description"
+                       VerticalAlignment="Center" />
+
+                <TextBox x:Name="txtEditDescription"
+                         Grid.Column="2"
+                         Height="25" />
+            </Grid>
+            <Grid Grid.Row="2">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="120" />
+                    <ColumnDefinition Width="10" />
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="10" />
+                    <ColumnDefinition Width="100" />
+                </Grid.ColumnDefinitions>
+                <Label x:Name="lblEditCommandLine"
+                       Grid.Column="0"
+                       Content="Command line"
+                       VerticalAlignment="Top" />
+
+                <TextBox x:Name="txtEditCommandLine"
+                         Grid.Column="2"
+                         Height="Auto"
+                         VerticalScrollBarVisibility="Visible"
+                         VerticalContentAlignment="Top" />
+
+                <Button x:Name="btnApplyCommandChanges"
+                        Content="Apply change"
+                        Grid.Column="4"
+                        Margin="5"
+                        VerticalAlignment="Top" Click=""/>
+            </Grid>
+        </Grid>
+
+        <Grid Grid.Row="2">
+            <!-- Add / Remove / Up / Down / OK / Cancel -->
+        </Grid>
+    </Grid>
+
+</Window>

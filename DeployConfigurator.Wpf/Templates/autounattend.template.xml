@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+╔════════════════════════════════════════════════════════════════════════════════╗
+║                                                                                ║
+║                      ───────────────────────────────────                       ║
+║                        © Copyright PB-BZH Concept 2025                         ║
+║                      ───────────────────────────────────                       ║
+║                                                                                ║
+║                 contact : mailto:patrick.bourges@univ-brest.fr                 ║
+╚════════════════════════════════════════════════════════════════════════════════╝
+
+╔════════════════════════════════════════════════════════════════════════════════╗
+║  Auteur : Patrick Bourges - PB-BZH Concept                                     ║
+║  Le 22/5/2026 - 21:34                                                          ║                                                          
+╟────────────────────────────────────────────────────────────────────────────────║
+║     Projet VS_Pro_2022 C# 7.3 : DeployConfigurator                             ║                                      
+╟────────────────────────────────────────────────────────────────────────────────║
+║     Version : 3.0.1                                                            ║
+╟────────────────────────────────────────────────────────────────────────────────║
+║                Visual Studio Professional 2026 - Insiders                      ║
+║                ──────────────────────────────────────────                      ║
+║  Langage     : XAML 1.0; HTML5                                                 ║                                                
+║  Encodage    : utf-8 : Unicode - Pages de codes 1200                           ║
+╟────────────────────────────────────────────────────────────────────────────────║
+║  Nom de fichier : autounattend.template.xml												    
+╚════════════════════════════════════════════════════════════════════════════════╝
+-->
+<unattend xmlns="urn:schemas-microsoft-com:unattend">
+
+	<servicing>
+		<package action="configure">
+			<assemblyIdentity
+				name="Microsoft-Windows-Client-LanguagePack-Package"
+				version="10.0.19041.5131"
+				processorArchitecture="amd64"
+				publicKeyToken="31bf3856ad364e35"
+				language="fr-FR" />
+		</package>
+	</servicing>
+
+
+	<!-- ========================= -->
+	<!-- WINDOWS PE -->
+	<!-- ========================= -->
+	<settings pass="windowsPE">
+
+		<component name="Microsoft-Windows-International-Core-WinPE"
+				   processorArchitecture="amd64"
+				   publicKeyToken="31bf3856ad364e35"
+				   language="neutral"
+				   versionScope="nonSxS"
+				   xmlns:wcm="http://schemas.microsoft.com/WMIConfig/2002/State"
+				   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+
+			<SetupUILanguage>
+				<UILanguage>__UI_LANGUAGE__</UILanguage>
+			</SetupUILanguage>
+
+			<InputLocale>__INPUT_LOCALE_AUTOUNATTEND__</InputLocale>
+			<SystemLocale>__SYSTEM_LOCALE_AUTOUNATTEND__</SystemLocale>
+			<UILanguage>__UI_LANGUAGE__</UILanguage>
+			<UserLocale>__USER_LOCALE__</UserLocale>
+			<UILanguageFallback>__UI_LANGUAGE_FALLBACK__</UILanguageFallback>
+		</component>
+
+		<component name="Microsoft-Windows-Setup"
+				   processorArchitecture="amd64"
+				   publicKeyToken="31bf3856ad364e35"
+				   language="neutral"
+				   versionScope="nonSxS"
+				   xmlns:wcm="http://schemas.microsoft.com/WMIConfig/2002/State"
+				   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+
+			<UserData>
+				<AcceptEula>true</AcceptEula>
+				<FullName>__OWNER__</FullName>
+				<Organization>__ORGANIZATION__</Organization>
+				<ProductKey>
+					<WillShowUI>OnError</WillShowUI>
+					<Key>__PRODUCT_KEY__</Key>
+				</ProductKey>
+			</UserData>
+			
+			<!-- Lancement script disque -->
+			<RunSynchronous>
+				__WINDOWS_PE_SYNCHRONOUS_COMMANDS__
+			</RunSynchronous>>
+
+		</component>
+
+	</settings>
+
+</unattend>
