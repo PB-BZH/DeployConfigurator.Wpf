@@ -387,6 +387,12 @@ public partial class MainWindow: Window {
     HookOrchestrationPending(chkRunM365);
     HookOrchestrationPending(chkRunPostInstall);
     HookOrchestrationPending(chkRunCleanup);
+
+    // ============================================================
+    // PREVIEW
+    // ============================================================
+
+    TabMain.SelectionChanged += tabPreview_SelectedIndexChanged;
   }
   private static BitmapImage LoadImageResource(string fileName) {
     return new BitmapImage(new Uri($"/Ressources/{fileName}",UriKind.Relative));
@@ -3581,7 +3587,15 @@ public partial class MainWindow: Window {
       Close();
   }
 
-  private void tabPreview_SelectedIndexChanged(object? sender,EventArgs e) {
+  private void tabPreview_SelectedIndexChanged(object? sender,SelectionChangedEventArgs e) {
+
+    if (e.OriginalSource != TabMain)
+      return;
+
+    // Build Log est alimenté directement par le pipeline.
+    if (TabMain.SelectedIndex == 7)
+      return;
+
     _activePreviewDocument = TabMain.SelectedIndex switch {
       1 => PreviewDocumentType.SetupComplete,
       2 => PreviewDocumentType.Orchestrator,
@@ -3594,7 +3608,6 @@ public partial class MainWindow: Window {
 
     RefreshPreview();
   }
-
   private async Task WaitIfPipelinePausedAsync() {
     if (!_isPaused)
       return;
