@@ -1,11 +1,18 @@
-﻿using System.Configuration;
-using System.Data;
+using System.Text;
 using System.Windows;
 
 namespace DeployConfigurator.Wpf;
-/// <summary>
-/// Interaction logic for App.xaml
-/// </summary>
-public partial class App: Application {
-}
 
+public partial class App: Application {
+
+  protected override void OnStartup(StartupEventArgs e) {
+
+    // ============================================================
+    // ENCODAGES WINDOWS / DOS
+    // ============================================================
+
+    Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
+
+    base.OnStartup(e);
+  }
+}

@@ -1360,8 +1360,33 @@ public partial class MainWindow: Window {
     BrowseFolderInto(txtMediaWorkingDirectory);
   }
 
-  private void btnBuildWindowsMedia_Click(object sender,RoutedEventArgs e) {
+  private async void btnBuildWindowsMedia_Click(object sender,RoutedEventArgs e) {
 
+    // ============================================================
+    // BUILD WINDOWS MEDIA
+    // ============================================================
+
+    ApplyUiToProfile();
+
+    progressBuild.Value = 0;
+    lblBuildProgress.Content = "Démarrage...";
+
+    BuildPipelineService service = CreatePipelineService();
+
+    PipelineResult result =
+        await Task.Run(() => service.BuildWindowsMedia(_profile));
+
+    AppendPipelineLogs(result);
+
+    lblBuildProgress.Content = result.Success ? "Terminé" : "Erreur";
+
+    MessageBox.Show(
+        result.Message,
+        "Build Windows Media",
+        MessageBoxButton.OK,
+        result.Success
+            ? MessageBoxImage.Information
+            : MessageBoxImage.Error);
   }
 
   private void btnOpenMediaFolder_Click(object sender,RoutedEventArgs e) {
@@ -3300,31 +3325,6 @@ public partial class MainWindow: Window {
       FileName = path,
       UseShellExecute = true
     });
-  }
-
-  private async void btnBuildWindowsMedia_Click(object sender,EventArgs e) {
-    ApplyUiToProfile();
-
-    progressBuild.Value = 0;
-    lblBuildProgress.Content = "Démarrage...";
-
-    BuildPipelineService service = CreatePipelineService();
-
-    PipelineResult result =
-        await Task.Run(() => service.BuildWindowsMedia(_profile));
-
-    AppendPipelineLogs(result);
-
-    lblBuildProgress.Content = result.Success ? "Terminé" : "Erreur";
-
-    MessageBox.Show(
-        result.Message,
-        "Build Windows Media",
-        MessageBoxButton.OK,
-        result.Success
-            ? MessageBoxImage.Information
-            : MessageBoxImage.Error
-    );
   }
 
   private void btnBrowseWindowsIso_Click(object sender,EventArgs e) {
