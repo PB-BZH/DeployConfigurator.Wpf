@@ -17,24 +17,24 @@
         </Grid.RowDefinitions>
         <Grid Grid.Row="0">
             <!-- =========================================================
-     COMMANDES SYNCHRONES
-     ========================================================= -->
+                 COMMANDES SYNCHRONES
+                 ========================================================= -->
 
-            <TabControl x:Name="tabCommands">
-
+            <TabControl x:Name="tabWindowsPeCommands"
+                        SelectionChanged="tabCommands_SelectedIndexChanged">
+                
                 <!-- =====================================================
-         WINDOWS PE
-         ===================================================== -->
+                     WINDOWS PE
+                     ===================================================== -->
 
                 <TabItem Header="Windows PE">
-
                     <DataGrid x:Name="gridWindowsPeCommands"
                               AutoGenerateColumns="False"
                               CanUserAddRows="False"
                               CanUserDeleteRows="False"
                               SelectionMode="Single"
-                              SelectionUnit="FullRow" />
-
+                              SelectionUnit="FullRow"
+                              SelectionChanged="gridCommands_SelectionChanged" />
                 </TabItem>
 
 
@@ -43,18 +43,17 @@
                      ===================================================== -->
 
                 <TabItem Header="First Logon">
-
                     <DataGrid x:Name="gridFirstLogonCommands"
                               AutoGenerateColumns="False"
                               CanUserAddRows="False"
                               CanUserDeleteRows="False"
                               SelectionMode="Single"
-                              SelectionUnit="FullRow" />
-
+                              SelectionUnit="FullRow"
+                              SelectionChanged="gridCommands_SelectionChanged" />
                 </TabItem>
 
             </TabControl>
-            
+
         </Grid>
         <Grid x:Name="pnlEditor"
               Grid.Row="1"
@@ -144,12 +143,75 @@
                         Content="Apply change"
                         Grid.Column="4"
                         Margin="5"
-                        VerticalAlignment="Top" Click="btnAddCommand_Click"/>
+                        VerticalAlignment="Top"
+                        Click="btnApplyCommandChanges_Click" />
             </Grid>
         </Grid>
 
-        <Grid Grid.Row="2">
+        <Grid Grid.Row="2"
+              Margin="20,0,20,0">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="*" />                
+            </Grid.ColumnDefinitions>
             <!-- Add / Remove / Up / Down / OK / Cancel -->
+            <StackPanel Orientation="Horizontal"
+                        Grid.Column="0"
+                        VerticalAlignment="Center"
+                        HorizontalAlignment="Left"
+                        Width="Auto"
+                        Height="32">
+
+                <Button x:Name="btnAddCommand"
+                        Content="Add"
+                        Width="100"
+                        Margin="0,0,5,0"
+                        Click="btnAddCommand_Click"
+                        VerticalContentAlignment="Center" />
+
+                <Button x:Name="btnRemoveCommand"
+                        Content="Remove"
+                        Width="100"
+                        Margin="5,0,10,0"
+                        Click="btnRemoveCommand_Click"
+                        VerticalContentAlignment="Center" />
+
+                <Button x:Name="btnMoveUp"
+                        Content="Up"
+                        Width="100"
+                        Margin="10,0,5,0"
+                        Click="btnMoveUp_Click"
+                        VerticalContentAlignment="Center" />
+
+                <Button x:Name="btnMoveDown"
+                        Content="Down"
+                        Width="100"
+                        Margin="0,0,5,0"
+                        Click="btnMoveDown_Click"
+                        VerticalContentAlignment="Center" />
+            </StackPanel>
+            <StackPanel Orientation="Horizontal"
+                        Grid.Column="1"
+                        VerticalAlignment="Center"
+                        HorizontalAlignment="Right"
+                        Width="Auto"
+                        Height="32">
+                <Button x:Name="btnOk"
+                        Content="Ok"
+                        Width="100"
+                        Margin="0,0,5,0"
+                        IsDefault="True"
+                        Click="btnOk_Click"
+                        VerticalContentAlignment="Center" />
+
+                <Button x:Name="btnCancel"
+                        Content="Cancel"
+                        IsCancel="True"
+                        Width="100"
+                        Margin="5,0,0,0"
+                        Click="btnCancel_Click"
+                        VerticalContentAlignment="Center" />
+            </StackPanel>
         </Grid>
     </Grid>
 </Window>

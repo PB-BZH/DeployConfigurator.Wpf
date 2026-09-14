@@ -98,42 +98,41 @@ public partial class BuildPipelineService {
     }
   }
 
-  public static PipelineResult BuildPackage(DeploymentProfile profile) {
+  public static PipelineResult BuildPackage(DeploymentProfile profile,Action<int,string>? progress = null) {
+
     PipelineLogger log = new();
 
     try {
+
+      // ============================================================
+      // BUILD PACKAGE
+      // ============================================================
+
       log.Info("BUILD PACKAGE START");
 
-      new DeploymentPackageBuilder().GeneratePackage(profile);
+      progress?.Invoke(5,"Starting package build...");
+
+      new DeploymentPackageBuilder().GeneratePackage(profile,progress);
+
+      progress?.Invoke(100,"Package generated.");
 
       log.Success("Package generated successfully.");
 
-      PipelineResult result = PipelineResult.Ok(
+      return PipelineResult.Ok(
           "Package généré avec succès.",
-          [.. log.Lines]
-      );
-
-      //SavePipelineLog(profile,result);
-
-      return result;
+          [.. log.Lines]);
     }
     catch (Exception ex) {
+
+      // ============================================================
+      // ERREUR
+      // ============================================================
+
       log.Error(ex.Message);
-      PipelineResult result = PipelineResult.Fail(
+
+      return PipelineResult.Fail(
           ex.Message,
-          [.. log.Lines]
-      );
-
-      //SavePipelineLog(profile,result);
-
-      result = PipelineResult.Ok(
-          "Package généré avec succès.",
-          [.. log.Lines]
-      );
-
-      //SavePipelineLog(profile,result);
-
-      return result;
+          [.. log.Lines]);
     }
   }
 
@@ -310,6 +309,20 @@ public partial class BuildPipelineService {
 
       string args = $"-m -o -u2 -udfver102 -bootdata:2#p0,e,b\"{biosBoot}\"#pEF,e,b\"{uefiBoot}\" \"{mediaPath}\" \"{isoPath}\"";
 
+      log.Info("Media folder : " + mediaPath);
+      log.Info("ISO output   : " + isoPath);
+
+      if (File.Exists(isoPath)) {
+        FileInfo existingIso = new(isoPath);
+
+        log.Info(
+            $"Existing ISO : yes ({existingIso.Length} bytes)"
+        );
+      }
+      else {
+        log.Info("Existing ISO : no");
+      }
+
       ProgressCallback?.Invoke(40,"Launching oscdimg...");
       ProcessStartInfo psi = new() {
         FileName = oscdimg,
@@ -317,16 +330,49 @@ public partial class BuildPipelineService {
         UseShellExecute = false,
         CreateNoWindow = true,
         RedirectStandardOutput = true,
-        RedirectStandardError = true
+        RedirectStandardError = true,
+        StandardOutputEncoding = Encoding.GetEncoding(850),
+        StandardErrorEncoding = Encoding.GetEncoding(850)
       };
 
       using Process process = Process.Start(psi)!;
+
+      Task<string> outputTask = process.StandardOutput.ReadToEndAsync();
+      Task<string> errorTask = process.StandardError.ReadToEndAsync();
+
       process.WaitForExit();
-      log.Info(
-          "oscdimg exit code = " +
-          process.ExitCode
-      );
-      ProgressCallback?.Invoke(90,"Finalizing ISO...");
+
+      string output = outputTask.GetAwaiter().GetResult();
+      string error = errorTask.GetAwaiter().GetResult();
+
+      log.Info("oscdimg exit code = " + process.ExitCode);
+
+      if (process.ExitCode != 0) {
+
+        if (!string.IsNullOrWhiteSpace(output)) {
+          foreach (string line in output.Split(
+              ['\r','\n'],
+              StringSplitOptions.RemoveEmptyEntries)) {
+
+            log.Info("[OSCDIMG] " + line.Trim());
+          }
+        }
+
+        if (!string.IsNullOrWhiteSpace(error)) {
+          foreach (string line in error.Split(
+              ['\r','\n'],
+              StringSplitOptions.RemoveEmptyEntries)) {
+
+            log.Error("[OSCDIMG] " + line.Trim());
+          }
+        }
+
+        log.Error("ISO generation failed.");
+
+        return PipelineResult.Fail(
+            "Erreur pendant la génération ISO.",
+            [.. log.Lines]);
+      }
 
       if (process.ExitCode != 0) {
         log.Error("ISO generation failed.");

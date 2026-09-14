@@ -43,7 +43,7 @@
 
         <Grid.RowDefinitions>
 
-            <!-- Menu -->
+            <!-- mnu -->
             <RowDefinition Height="Auto" />
 
             <!-- Partie haute -->
@@ -62,7 +62,7 @@
 
 
         <!-- ==========================================================
-             MENU
+             mnu
              ========================================================== -->
 
         <Menu Grid.Row="0"
@@ -151,12 +151,10 @@
             <MenuItem Header="_Options">
                 <MenuItem x:Name="mnuOemCommands"
                           Header="OEM Commands"
-                          Click="mnuOemCommands_Click"
-                          IsCheckable="True" />
+                          Click="mnuOemCommands_Click" />
                 <MenuItem x:Name="mnuSynchronousCommands"
                           Header="Synchronous Commands"
-                          Click="mnuSynchronousCommands_Click"
-                          IsCheckable="True" />
+                          Click="mnuSynchronousCommands_Click" />
                 <Separator />
                 <MenuItem x:Name="ThemeMode"
                           Header="Theme sombre"
@@ -559,6 +557,7 @@
                         <TextBox x:Name="txtProductKey"
                                  Grid.Row="0"
                                  Grid.Column="2"
+                                 VerticalContentAlignment="Center"
                                  Height="25" />
 
 
@@ -652,6 +651,7 @@
                         <TextBox x:Name="txtOrganization"
                                  Grid.Row="4"
                                  Grid.Column="2"
+                                 VerticalContentAlignment="Center"
                                  Height="25" />
 
 
@@ -667,6 +667,7 @@
                         <TextBox x:Name="txtOwner"
                                  Grid.Row="5"
                                  Grid.Column="2"
+                                 VerticalContentAlignment="Center"
                                  Height="25" />
 
                     </Grid>
@@ -710,6 +711,7 @@
                         <TextBox x:Name="txtComputerName"
                                  Grid.Row="0"
                                  Grid.Column="2"
+                                 VerticalContentAlignment="Center"
                                  Height="25" />
 
 
@@ -735,6 +737,7 @@
                         <TextBox x:Name="txtLocalUserName"
                                  Grid.Row="4"
                                  Grid.Column="2"
+                                 VerticalContentAlignment="Center"
                                  Height="25" />
 
 
@@ -750,6 +753,7 @@
                         <PasswordBox x:Name="txtAdminPassword"
                                      Grid.Row="5"
                                      Grid.Column="2"
+                                     VerticalContentAlignment="Center"
                                      Height="25" />
 
 
@@ -845,6 +849,7 @@
 
                         <TextBox x:Name="txtPackageName"
                                  Grid.Column="2"
+                                 VerticalContentAlignment="Center"
                                  Height="25" />
 
                         <Label x:Name="lblPackageVersion"
@@ -854,6 +859,7 @@
 
                         <TextBox x:Name="txtPackageVersion"
                                  Grid.Column="6"
+                                 VerticalContentAlignment="Center"
                                  Height="25" />
 
                         <Label x:Name="lblPackageAuthor"
@@ -863,6 +869,7 @@
 
                         <TextBox x:Name="txtPackageAuthor"
                                  Grid.Column="10"
+                                 VerticalContentAlignment="Center"
                                  Height="25" />
 
                     </Grid>
@@ -882,6 +889,7 @@
 
                         <TextBox x:Name="txtOutputDirectory"
                                  Grid.Column="2"
+                                 VerticalContentAlignment="Center"
                                  Height="25" />
 
                         <Button x:Name="btnBrowseOutputDirectory"
@@ -944,6 +952,7 @@
                         <TextBox x:Name="txtDriversSourcePath"
                                  Grid.Column="2"
                                  Grid.Row="0"
+                                 VerticalContentAlignment="Center"
                                  Height="25" />
 
                         <Button x:Name="btnBrowseDriversSourcePath"
@@ -963,6 +972,7 @@
                         <TextBox x:Name="txtApplicationsSourcePath"
                                  Grid.Column="8"
                                  Grid.Row="0"
+                                 VerticalContentAlignment="Center"
                                  Height="25" />
 
                         <Button x:Name="btnBrowseApplicationsSourcePath"
@@ -998,6 +1008,7 @@
                         <TextBox x:Name="txtSetupScriptsSourcePath"
                                  Grid.Column="2"
                                  Grid.Row="2"
+                                 VerticalContentAlignment="Center"
                                  Height="25" />
 
                         <Button x:Name="btnBrowseSetupScriptsSourcePath"
@@ -1017,6 +1028,7 @@
                         <TextBox x:Name="txtSetupConfigSourcePath"
                                  Grid.Column="8"
                                  Grid.Row="2"
+                                 VerticalContentAlignment="Center"
                                  Height="25" />
 
                         <Button x:Name="btnBrowseSetupConfigSourcePath"
@@ -1098,6 +1110,7 @@
                              Grid.Row="0"
                              Grid.Column="2"
                              Grid.ColumnSpan="3"
+                             VerticalContentAlignment="Center"
                              Height="25" />
 
                     <Button x:Name="btnBrowseWindowsIsoPath"
@@ -1118,6 +1131,7 @@
                              Grid.Column="2"
                              Grid.Row="1"
                              Grid.ColumnSpan="3"
+                             VerticalContentAlignment="Center"
                              Height="25" />
 
                     <Button x:Name="btnBrowseMediaWorkingDirectory"
@@ -1206,6 +1220,7 @@
                              Grid.Column="2"
                              Grid.Row="8"
                              Grid.ColumnSpan="5"
+                             VerticalContentAlignment="Center"
                              Height="25" />
 
                     <Button x:Name="btnBuildIso"
@@ -1215,6 +1230,7 @@
                             Content="Build ISO"
                             Width="150"
                             Height="25"
+                            IsEnabled="{Binding IsChecked, ElementName=chkPrepareUsbMedia}"
                             Click="btnBuildIso_Click" />
                 </Grid>
             </GroupBox>
@@ -1291,7 +1307,8 @@
                         <Label x:Name="lblOrchestrationPending"
                                Grid.Column="0"
                                Content="Changes pending"
-                               Foreground="Red"
+                               Style="{DynamicResource RedLabel}"
+                               Tag="KeepForeColor"
                                VerticalAlignment="Center"
                                Margin="20,0,20,5" />
 
@@ -1332,6 +1349,8 @@
                         HorizontalAlignment="Center">
                 <Label x:Name="txtActualOperation"
                        Content="Actual operation"
+                       Style="{DynamicResource AquaLabel}"
+                       Tag="KeepForeColor"
                        VerticalAlignment="Center"
                        Margin="0,0,5,0" />
                 <Image x:Name="picOperation"
@@ -1342,6 +1361,8 @@
                        Source="/Ressources/gear.png" />
                 <TextBox x:Name="txtOperationStatus"
                          Margin="5,0,0,0"
+                         Style="{DynamicResource OperationStatus}"
+                         Tag="KeepForeColor"
                          Text="Operation status"
                          VerticalContentAlignment="Center"
                          Width="250" />
@@ -1393,7 +1414,7 @@
                     <TextBox x:Name="txtSearch"
                              Grid.Column="2"
                              Height="23"
-                             VerticalAlignment="Center" />
+                             VerticalContentAlignment="Center" />
 
 
                     <Button x:Name="btnFindNext"
@@ -1462,15 +1483,20 @@
             </StackPanel>
             <StackPanel Grid.Row="2"
                         Grid.Column="0"
-                        Width="440"
+                        Width="445"
                         Orientation="Horizontal"
                         HorizontalAlignment="Center">
-                <ProgressBar x:Name="progressBuild"
+                <ProgressBar x:Name="progressBuild"                             
                              Width="400"
-                             Height="32" />
+                             Minimum="0"
+                             Maximum="100"
+                             Style="{DynamicResource ProgressBar}"
+                             Tag="KeepForeColor"
+                             Value="50"
+                             Height="25"/>
                 <Button x:Name="btnPauseResume"
-                        Width="32"
-                        Height="32"
+                        Width="40"
+                        Height="25"
                         Margin="5"
                         Click="btnPauseResume_Click">
 
@@ -1488,19 +1514,24 @@
                         HorizontalAlignment="Left">
                 <Button x:Name="btnPrintSelectedItem"
                         Content="Print"
-                        Margin="0,0,35,0"
+                        Margin="0,0,10,0"
                         Width="150"
                         Click="btnPrintSelectedView_Click" />
                 <Label x:Name="lblBuildProgress"
                        Content="Progression"
                        Width="Auto"
                        Margin="5,0,70,0"
-                       Height="25" />
+                       Style="{DynamicResource AquaLabel}"
+                       Tag="KeepForeColor"
+                       VerticalAlignment="Center"
+                       Height="28" />
                 <Label x:Name="lblCurrentFile"
                        Content="Message"
+                       Style="{DynamicResource AquaLabel}"
+                       Tag="KeepForeColor"
+                       Height="28"
                        Width="Auto"
-                       Margin="5,0,50,0"
-                       Height="25" />
+                       Margin="40,0,50,0" />
             </StackPanel>
         </Grid>
 
@@ -1515,8 +1546,8 @@
                     d:LayoutOverrides="VerticalAlignment">
 
             <!-- =========================================================
-         DISKPREP
-         ========================================================= -->
+             DISKPREP
+             ========================================================= -->
 
             <TabItem Header="diskprep.cmd">
                 <controls:PreviewEditor x:Name="previewDiskPrep"
@@ -1525,8 +1556,8 @@
             </TabItem>
 
             <!-- =========================================================
-         SETUPCOMPLETE
-         ========================================================= -->
+             SETUPCOMPLETE
+             ========================================================= -->
 
             <TabItem Header="SetupComplete.cmd">
                 <controls:PreviewEditor x:Name="previewSetupComplete"
@@ -1535,8 +1566,8 @@
             </TabItem>
 
             <!-- =========================================================
-         ORCHESTRATOR
-         ========================================================= -->
+                 ORCHESTRATOR
+                 ========================================================= -->
 
             <TabItem Header="Orchestrator_resume.cmd">
                 <controls:PreviewEditor x:Name="previewOrchestrator_resume"
@@ -1545,8 +1576,8 @@
             </TabItem>
 
             <!-- =========================================================
-         AUTOUNATTEND
-         ========================================================= -->
+                 AUTOUNATTEND
+                 ========================================================= -->
 
             <TabItem Header="autounattend.xml">
                 <controls:PreviewEditor x:Name="previewAutoUnattend"
@@ -1555,8 +1586,8 @@
             </TabItem>
 
             <!-- =========================================================
-         UNATTEND
-         ========================================================= -->
+                 UNATTEND
+                 ========================================================= -->
 
             <TabItem Header="unattend.xml">
                 <controls:PreviewEditor x:Name="previewUnattend"
@@ -1565,8 +1596,8 @@
             </TabItem>
 
             <!-- =========================================================
-         PROFILE
-         ========================================================= -->
+                 PROFILE
+                 ========================================================= -->
 
             <TabItem Header="profile.deploy.json">
                 <controls:PreviewEditor x:Name="previewProfileDeployJson"
@@ -1575,8 +1606,8 @@
             </TabItem>
 
             <!-- =========================================================
-         BUILD REPORT
-         ========================================================= -->
+                 BUILD REPORT
+                 ========================================================= -->
 
             <TabItem Header="Build report">
                 <controls:PreviewEditor x:Name="previewprofileBuildReport"
@@ -1585,8 +1616,8 @@
             </TabItem>
 
             <!-- =========================================================
-         BUILD LOG
-         ========================================================= -->
+                 BUILD LOG
+                 ========================================================= -->
 
             <TabItem Header="Build Log">
                 <controls:PreviewEditor x:Name="previewBuildLog"

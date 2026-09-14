@@ -179,7 +179,7 @@ public partial class PreviewEditor: UserControl {
   }
 
   //======================================================
-  //CONTEXT MENU
+  //CONTEXT mnu
   //======================================================
 
   private void Copy_Click(
@@ -204,6 +204,6 @@ public partial class PreviewEditor: UserControl {
 
     OpenInNotepadPlusPlusRequested?.Invoke(
       this,
-      EventArgs.Empty);
+      RoutedEventArgs.Empty);
   }
 }

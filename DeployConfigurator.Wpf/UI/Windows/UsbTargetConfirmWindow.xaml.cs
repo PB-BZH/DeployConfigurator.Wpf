@@ -16,7 +16,7 @@ public partial class UsbTargetConfirmWindow: Window {
 
   public UsbTargetConfirmWindow(List<UsbDeviceInfo> devices) {
     InitializeComponent();
-    ThemeManager.SetTheme(AppTheme.Dark);
+    ThemeManager.ApplyTheme(this);
 
     // WPF : DataSource -> ItemsSource
     cmbUsbDevices.ItemsSource = devices;

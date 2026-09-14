@@ -13,7 +13,7 @@ public partial class OemOptionsWindow: Window {
   public OemOptionsWindow(OemConfiguration oem) {
     InitializeComponent();
     Oem = Clone(oem);
-    ThemeManager.SetTheme(AppTheme.Dark);
+    ThemeManager.ApplyTheme(this);
     LoadToUi();
     UpdateUiState();
   }

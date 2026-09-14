@@ -6,7 +6,7 @@
         xmlns:local="clr-namespace:DeployConfigurator.Wpf.UI.Windows"
         mc:Ignorable="d"
         Title="USB Target Confirmation"
-        Height="300"
+        Height="350"
         Width="600">
     <Grid Margin="10">
         <Grid.RowDefinitions>
@@ -73,9 +73,10 @@
             <ComboBox x:Name="cmbPartitionType"
                       Grid.Row="0"
                       Grid.Column="6"
+                      SelectedIndex="0"
                       Height="25">
-                <ComboBoxItem Content="MBR (BIOS/CSM)" />
                 <ComboBoxItem Content="GPT (UEFI)" />
+                <ComboBoxItem Content="MBR (BIOS/CSM)" />
             </ComboBox>
 
             <Label Grid.Row="1"
@@ -124,6 +125,7 @@
                       Grid.Row="2"
                       Grid.Column="4"
                       Grid.ColumnSpan="3"
+                      IsChecked="True"
                       VerticalAlignment="Center" />
         </Grid>
 
@@ -149,7 +151,10 @@
                    VerticalAlignment="Center"
                    Padding="0">
 
-                <TextBlock TextAlignment="Center"
+                <TextBlock x:Name="lblWarning1"
+                           TextAlignment="Center"
+                           Style="{DynamicResource Warning}"
+                           Tag="KeepForeColor"
                            FontWeight="Bold">
 
                     <Run Text="WARNING:" />

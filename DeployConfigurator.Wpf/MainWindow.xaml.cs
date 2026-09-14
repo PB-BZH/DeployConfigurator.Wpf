@@ -11,6 +11,7 @@ using System.Windows.Documents;
 using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
+using System.Windows.Threading;
 using DeployConfigurator.Wpf.Core.Builders;
 using DeployConfigurator.Wpf.Core.Enums;
 using DeployConfigurator.Wpf.Core.Models;
@@ -167,11 +168,7 @@ public partial class MainWindow: Window {
       ThemeMode.IsChecked
         ? AppTheme.Dark
         : AppTheme.Light);
-
-    lblValidation.Foreground = Brushes.Red;
-    lblOrchestrationPending.Foreground = Brushes.Orange;
   }
-
 
   private void FindNext() {
     RichTextBox textBox = CurrentPreviewTextBox;
@@ -287,14 +284,9 @@ public partial class MainWindow: Window {
   }
 
 
-  private void HookConfigurationChanged(
-  CheckBox checkBox) {
-
-    checkBox.Checked +=
-      ConfigurationChanged;
-
-    checkBox.Unchecked +=
-      ConfigurationChanged;
+  private void HookConfigurationChanged(CheckBox checkBox) {
+    checkBox.Checked += ConfigurationChanged;
+    checkBox.Unchecked += ConfigurationChanged;
   }
 
   private void MarkOrchestrationPending() {
@@ -395,7 +387,8 @@ public partial class MainWindow: Window {
     TabMain.SelectionChanged += tabPreview_SelectedIndexChanged;
   }
   private static BitmapImage LoadImageResource(string fileName) {
-    return new BitmapImage(new Uri($"/Ressources/{fileName}",UriKind.Relative));
+    return new BitmapImage(
+        new Uri($"pack://application:,,,/Ressources/{fileName}",UriKind.Absolute));
   }
 
   private void HookDeferredRefresh(
@@ -1268,33 +1261,68 @@ public partial class MainWindow: Window {
   }
 
   private BuildPipelineService CreatePipelineService() {
+
     BuildPipelineService service = new();
 
-    service.ProgressChanged += (value,message) => {
+
+    // ============================================================
+    // PROGRESSION
+    // ============================================================
+
+    void ReportProgress(int value,string message) {
+
       if (!Dispatcher.CheckAccess()) {
-        Dispatcher.BeginInvoke(
-          new Action(
-            () => UpdateBuildProgress(value,message)));
+        Dispatcher.BeginInvoke(new Action(() => UpdateBuildProgress(value,message)));
+        return;
       }
-      else {
-        UpdateBuildProgress(value,message);
+
+      UpdateBuildProgress(value,message);
+    }
+
+    service.ProgressChanged += ReportProgress;
+    service.ProgressCallback = ReportProgress;
+
+
+    // ============================================================
+    // LOG EN DIRECT
+    // ============================================================
+
+    service.LiveLogCallback = line => {
+
+      if (!Dispatcher.CheckAccess()) {
+        Dispatcher.BeginInvoke(new Action(() => AppendBuildLog(line)));
+        return;
       }
+
+      AppendBuildLog(line);
     };
 
     return service;
   }
 
   private async Task BuildPackage() {
+
+    // ============================================================
+    // INITIALISATION
+    // ============================================================
+
     ApplyUiToProfile();
 
     progressBuild.Value = 0;
     lblBuildProgress.Content = "Démarrage...";
 
-    BuildPipelineService service = CreatePipelineService();
+
+    // ============================================================
+    // BUILD PACKAGE
+    // ============================================================
 
     PipelineResult result = await Task.Run(() =>
-        BuildPipelineService.BuildPackage(_profile)
-    );
+        BuildPipelineService.BuildPackage(_profile,UpdateBuildProgress));
+
+
+    // ============================================================
+    // RÉSULTAT
+    // ============================================================
 
     AppendPipelineLogs(result);
 
@@ -1304,8 +1332,7 @@ public partial class MainWindow: Window {
         result.Message,
         "Build Package",
         MessageBoxButton.OK,
-        result.Success ? MessageBoxImage.Information : MessageBoxImage.Error
-    );
+        result.Success ? MessageBoxImage.Information : MessageBoxImage.Error);
   }
 
   private bool TryGetSelectedPreviewEditor(out RichTextBox editor) {
@@ -1336,10 +1363,6 @@ public partial class MainWindow: Window {
     return text;
   }
 
-  private void btnBrowseOutputDirectory_Click(object sender,RoutedEventArgs e) {
-    BrowseFolderInto(txtOutputDirectory);
-  }
-
   private void btnBrowseApplicationsSourcePath_Click(object sender,RoutedEventArgs e) {
     BrowseFolderInto(txtApplicationsSourcePath);
   }
@@ -1350,9 +1373,6 @@ public partial class MainWindow: Window {
 
   private void btnBrowseDriversSourcePath_Click(object sender,RoutedEventArgs e) {
     BrowseFolderInto(txtDriversSourcePath);
-  }
-  private void btnBrowseMediaWorkingDirectory_Click(object sender,RoutedEventArgs e) {
-    BrowseFolderInto(txtMediaWorkingDirectory);
   }
 
   private async void btnBuildWindowsMedia_Click(object sender,RoutedEventArgs e) {
@@ -1384,34 +1404,35 @@ public partial class MainWindow: Window {
             : MessageBoxImage.Error);
   }
 
-  private void btnOpenMediaFolder_Click(object sender,RoutedEventArgs e) {
-
-  }
-
   private void btnApply_Click(object sender,RoutedEventArgs e) {
 
   }
 
-  private void btnBuildIso_Click(object sender,RoutedEventArgs e) {
+  // ============================================================
+  // BUILD ISO
+  // ============================================================
 
-  }
+  private async void btnBuildIso_Click(object sender,RoutedEventArgs e) {
 
-  private void menuSaveProfile_Click(object? sender,RoutedEventArgs e) {
     ApplyUiToProfile();
 
-    SaveFileDialog dialog = new() {
-      Filter = "Deploy Profile (*.deploy.json)|*.deploy.json",
-      FileName = "default.deploy.json"
-    };
+    progressBuild.Value = 0;
+    lblBuildProgress.Content = "Démarrage...";
 
-    if (dialog.ShowDialog() != true)
-      return;
+    BuildPipelineService service = CreatePipelineService();
 
-    ProfileSerializer.Save(dialog.FileName,_profile);
+    PipelineResult result =
+        await Task.Run(() => service.BuildIso(_profile));
 
-    _currentProfilePath = dialog.FileName;
+    AppendPipelineLogs(result);
 
-    UpdateStatusBar();
+    lblBuildProgress.Content = result.Success ? "Terminé" : "Erreur";
+
+    MessageBox.Show(
+        result.Message,
+        "Build ISO",
+        MessageBoxButton.OK,
+        result.Success ? MessageBoxImage.Information : MessageBoxImage.Error);
   }
 
   private void menuOpenProfile_Click(object? sender,RoutedEventArgs e) {
@@ -1432,11 +1453,6 @@ public partial class MainWindow: Window {
     _profile = new DeploymentProfile();
     _currentProfilePath = "";
     LoadProfileToUi();
-  }
-
-  private void menuExit_Click(object? sender,RoutedEventArgs e) {
-    if (_orchestrationPendingChanges)
-      Close();
   }
 
   private void menuEditSelectedView_Click(object sender,RoutedEventArgs e) {
@@ -1547,10 +1563,6 @@ public partial class MainWindow: Window {
         break;
     }
   }
-  private void mnuOemCommands_Click(object sender,RoutedEventArgs e) {
-
-  }
-
   private void mnuSynchronousCommands_Click(object sender,RoutedEventArgs e) {
     SynchronousCommandsWindow window = new(_profile.WindowsPeCommands,_profile.FirstLogonCommands);
 
@@ -1572,10 +1584,6 @@ public partial class MainWindow: Window {
     UpdateStatusBar();
   }
 
-  private void mnuAbout_Click(object? sender,RoutedEventArgs e) {
-    HelpHelper.mnuAbout(this,_profile);
-  }
-
   private void MnuLicense_Click(object sender,RoutedEventArgs e) {
     LicenseHelper.AfficherLicence(this,_licenseService,_profile);
   }
@@ -1588,32 +1596,16 @@ public partial class MainWindow: Window {
     await HelpHelper.mnuCheckForUpdates(this,_profile);
   }
 
-  private void btnBuildAll_Click(object sender,RoutedEventArgs e) {
-
-  }
-
   private void btnOpenBuildAllPackages_Click(object sender,RoutedEventArgs e) {
 
   }
 
-  private void btnBuildPackage_Click(object sender,RoutedEventArgs e) {
-
+  private async void btnBuildPackage_Click(object sender,RoutedEventArgs e) {
+    await BuildPackage();
   }
 
-  private void btnOpenPackageFolder_Click(object sender,RoutedEventArgs e) {
-
-  }
-
-  private void btnPrepareUSB_Click(object sender,RoutedEventArgs e) {
-
-  }
-
-  private void btnPauseResume_Click(object sender,RoutedEventArgs e) {
-
-  }
-
-  private void btnCancelBuild_Click(object sender,RoutedEventArgs e) {
-
+  private async void btnPrepareUSB_Click(object sender,RoutedEventArgs e) {
+    await RunPrepareUsbPipelineAsync(DateTime.Now);
   }
 
   private void btnPrintSelectedView_Click(object sender,RoutedEventArgs e) {
@@ -1621,14 +1613,6 @@ public partial class MainWindow: Window {
     if (!flowControl) {
       return;
     }
-  }
-
-  private void btnCloseSearch_Click(object sender,RoutedEventArgs e) {
-
-  }
-
-  private void btnFindNext_Click(object sender,RoutedEventArgs e) {
-
   }
 
   private void btnBrowseSetupConfigSourcePath_Click(object sender,RoutedEventArgs e) {
@@ -1645,10 +1629,6 @@ public partial class MainWindow: Window {
   //  55 - 75   Injection Deploy
   //  75 - 100  Finalisation média
   // ===================================================
-
-  private async void btnPrepareUsb_Click(object sender,EventArgs e) {
-    await RunPrepareUsbPipelineAsync(DateTime.Now);
-  }
 
   private async Task<bool> RunPrepareUsbPipelineAsync(DateTime usbStartTime) {
     imgPauseResume.Source = LoadImageResource("pause.png");
@@ -2611,7 +2591,7 @@ public partial class MainWindow: Window {
       .Text = text;
   }
 
-  private void PreviewDiskPrep_OpenInNotepadPlusPlusRequested(object? sender,EventArgs e) {
+  private void PreviewDiskPrep_OpenInNotepadPlusPlusRequested(object? sender,RoutedEventArgs e) {
     OpenTextInNotepadPlusPlus(GetRichText(previewDiskPrep.Editor),"diskprep.cmd");
   }
 
@@ -3077,11 +3057,10 @@ public partial class MainWindow: Window {
   }
 
   private void ToggleBuildButtons(bool enabled) {
-    btnBuildPackage.IsEnabled = true;
-    btnBuildWindowsMedia.IsEnabled = true;
-    btnPrepareUSB.IsEnabled = true;
-
-    btnCancelBuild.IsEnabled = true;
+    btnBuildPackage.IsEnabled = enabled;
+    btnBuildWindowsMedia.IsEnabled = enabled;
+    btnPrepareUSB.IsEnabled = enabled;
+    btnCancelBuild.IsEnabled = enabled;
   }
 
   private UsbPreparationService CreateUsbPreparationService() {
@@ -3100,16 +3079,11 @@ public partial class MainWindow: Window {
     return service;
   }
 
-  private void menuOemOptions_Click(
-      object? sender,
-      EventArgs e) {
+  private void mnuOemCommands_Click(object? sender,RoutedEventArgs e) {
     OemOptionsWindow window = new(_profile.Oem);
-
     if (!ShowModalWithFade(window))
       return;
-
     _profile.Oem = window.Oem;
-
     RefreshPreview();
     UpdateStatusBar();
   }
@@ -3139,14 +3113,14 @@ public partial class MainWindow: Window {
     return !hasError;
   }
 
-  private void btnCancelBuild_Click(object sender,EventArgs e) {
+  private void btnCancelBuild_Click(object sender,RoutedEventArgs e) {
     _buildCancellation?.Cancel();
 
     lblBuildProgress.Content = "Annulation demandée...";
     btnCancelBuild.IsEnabled = false;
   }
 
-  private void btnBrowseFinalIsoPath_Click(object sender,EventArgs e) {
+  private void btnBrowseFinalIsoPath_Click(object sender,RoutedEventArgs e) {
     SaveFileDialog dialog = new() {
       Filter = "ISO files (*.iso)|*.iso",
       FileName = "WindowsMedia.iso"
@@ -3179,12 +3153,12 @@ public partial class MainWindow: Window {
         Path.Combine(parent,"WindowsMedia.iso");
   }
 
-  private void btnBrowseMediaWorkingDirectory_Click(object sender,EventArgs e) {
+  private void btnBrowseMediaWorkingDirectory_Click(object sender,RoutedEventArgs e) {
     BrowseFolderInto(txtMediaWorkingDirectory);
     UpdateIsoOutputFromMediaFolder();
   }
 
-  private async void btnBuildAll_Click(object sender,EventArgs e) {
+  private async void btnBuildAll_Click(object sender,RoutedEventArgs e) {
     ApplyUiToProfile();
 
     if (!ValidateBuildReadiness()) {
@@ -3244,39 +3218,6 @@ public partial class MainWindow: Window {
     }
   }
 
-  private async void btnBuildIso_Click(
-      object sender,
-      EventArgs e) {
-    ApplyUiToProfile();
-
-    progressBuild.Value = 0;
-    lblBuildProgress.Content = "Démarrage...";
-
-    BuildPipelineService service =
-        CreatePipelineService();
-
-    PipelineResult result =
-        await Task.Run(() =>
-            service.BuildIso(_profile)
-        );
-
-    AppendPipelineLogs(result);
-
-    lblBuildProgress.Content =
-        result.Success
-            ? "Terminé"
-            : "Erreur";
-
-    MessageBox.Show(
-        result.Message,
-        "Build ISO",
-        MessageBoxButton.OK,
-        result.Success
-            ? MessageBoxImage.Information
-            : MessageBoxImage.Error
-    );
-  }
-
   private void UpdateBuildProgress(int value,string message) {
     if (!Dispatcher.CheckAccess()) {
       Dispatcher.Invoke(() => UpdateBuildProgress(value,message));
@@ -3302,7 +3243,7 @@ public partial class MainWindow: Window {
     lblCurrentFile.Content = "";
   }
 
-  private void btnOpenMediaFolder_Click(object sender,EventArgs e) {
+  private void btnOpenMediaFolder_Click(object sender,RoutedEventArgs e) {
     string path = txtMediaWorkingDirectory.Text;
 
     if (!Directory.Exists(path)) {
@@ -3365,12 +3306,12 @@ public partial class MainWindow: Window {
     previewBuildLog.Editor.ScrollToEnd();
   }
 
-  private void DeferredRefresh_Leave(object? sender,EventArgs e) {
+  private void DeferredRefresh_Leave(object? sender,RoutedEventArgs e) {
     ValidateConfiguration();
     UpdateStatusBar();
   }
 
-  private void btnApplyOrchestration_Click(object sender,EventArgs e) {
+  private void btnApplyOrchestration_Click(object sender,RoutedEventArgs e) {
     ValidateConfiguration();
     RefreshPreview();
     UpdateStatusBar();
@@ -3379,56 +3320,35 @@ public partial class MainWindow: Window {
     lblOrchestrationPending.Visibility = Visibility.Collapsed;
   }
 
-  private void btnBrowseSetupScripts_Click(object sender,EventArgs e) {
+  private void btnBrowseSetupScripts_Click(object sender,RoutedEventArgs e) {
     BrowseFolderInto(txtSetupScriptsSourcePath);
   }
 
-  private void btnBrowseSetupConfig_Click(object sender,EventArgs e) {
+  private void btnBrowseSetupConfig_Click(object sender,RoutedEventArgs e) {
     BrowseFolderInto(txtSetupConfigSourcePath);
   }
 
-  private void btnBrowseOutputDirectory_Click(object sender,EventArgs e) {
+  private void btnBrowseOutputDirectory_Click(object sender,RoutedEventArgs e) {
     BrowseFolderInto(txtOutputDirectory);
   }
 
-  private void btnBrowseDrivers_Click(object sender,EventArgs e) {
+  private void btnBrowseDrivers_Click(object sender,RoutedEventArgs e) {
     BrowseFolderInto(txtDriversSourcePath);
   }
 
-  private void btnBrowseApplications_Click(object sender,EventArgs e) {
+  private void btnBrowseApplications_Click(object sender,RoutedEventArgs e) {
     BrowseFolderInto(txtApplicationsSourcePath);
   }
 
-  //private void btnBrowseScripts_Click(object sender,EventArgs e) {
+  //private void btnBrowseScripts_Click(object sender,RoutedEventArgs e) {
   //  BrowseFolderInto(txtSetupScriptsSourcePath);
   //}
 
-  //private void btnBrowseWinPE_Click(object sender,EventArgs e) {
+  //private void btnBrowseWinPE_Click(object sender,RoutedEventArgs e) {
   //  BrowseFolderInto(txtWinPESourcePath);
   //}
 
-  private void ConfigurationChanged(object? sender,EventArgs e) {
-    Debug.WriteLine($"CONFIG CHANGE from: {(sender as Control)?.Name}");
-    if (!_livePreviewReady)
-      return;
-
-    if (_isRefreshingPreview)
-      return;
-
-    try {
-      _isRefreshingPreview = true;
-
-      UpdateUiState();
-      ValidateConfiguration();
-      RefreshPreview();
-      UpdateStatusBar();
-    }
-    finally {
-      _isRefreshingPreview = false;
-    }
-  }
-
-  private void btnOpenPackageFolder_Click(object sender,EventArgs e) {
+  private void btnOpenPackageFolder_Click(object sender,RoutedEventArgs e) {
     ApplyUiToProfile();
 
     if (string.IsNullOrWhiteSpace(_profile.Package.OutputDirectory)) {
@@ -3464,7 +3384,7 @@ public partial class MainWindow: Window {
     });
   }
 
-  private void txtPreview_TextChanged(object? sender,EventArgs e) {
+  private void txtPreview_TextChanged(object? sender,RoutedEventArgs e) {
     if (_isUpdatingPreview)
       return;
 
@@ -3503,21 +3423,17 @@ public partial class MainWindow: Window {
     ApplySyntaxHighlighting();
   }
 
-  private void btnFindNext_Click(object sender,EventArgs e) {
+  private void btnFindNext_Click(object sender,RoutedEventArgs e) {
     FindNext();
   }
 
-  private void btnCloseSearch_Click(object sender,EventArgs e) {
+  private void btnCloseSearch_Click(object sender,RoutedEventArgs e) {
     txtSearch.Clear();
     CurrentPreviewTextBox.Focus();
   }
 
-  private void btnPreview_Click(object sender,EventArgs e) {
+  private void btnPreview_Click(object sender,RoutedEventArgs e) {
     RefreshPreview();
-  }
-
-  private async void btnBuildPackage_Click(object sender,EventArgs e) {
-    await BuildPackage();
   }
 
   private void menuPrintSelectedView_Click(object sender,RoutedEventArgs e) {
@@ -3556,7 +3472,7 @@ public partial class MainWindow: Window {
     return true;
   }
 
-  private void menuSaveProfile_Click(object? sender,EventArgs e) {
+  private void menuSaveProfile_Click(object? sender,RoutedEventArgs e) {
     ApplyUiToProfile();
 
     SaveFileDialog dialog = new() {
@@ -3576,13 +3492,7 @@ public partial class MainWindow: Window {
     UpdateStatusBar();
   }
 
-  private void menuNewProfile_Click(object? sender,EventArgs e) {
-    _profile = new DeploymentProfile();
-    _currentProfilePath = "";
-    LoadProfileToUi();
-  }
-
-  private void menuExit_Click(object? sender,EventArgs e) {
+  private void menuExit_Click(object? sender,RoutedEventArgs e) {
     if (_orchestrationPendingChanges)
       Close();
   }
@@ -3621,7 +3531,7 @@ public partial class MainWindow: Window {
     SetOperationStatus("REPRISE...");
   }
 
-  private void btnBuildPackageFolder_Click(object sender,EventArgs e) {
+  private void btnBuildPackageFolder_Click(object sender,RoutedEventArgs e) {
     ApplyUiToProfile();
 
     string buildAllPath = _profile.WindowsMedia.MediaFolder;
@@ -3675,21 +3585,21 @@ public partial class MainWindow: Window {
     }
   }
 
-  private void btnPauseResume_Click(object sender,EventArgs e) {
+  private void btnPauseResume_Click(object sender,RoutedEventArgs e) {
     TogglePauseResume();
   }
-  private void mnuAbout_Click(object? sender,EventArgs e) {
+  private void mnuAbout_Click(object? sender,RoutedEventArgs e) {
     HelpHelper.mnuAbout(this,_profile);
   }
 
-  private async void mnuCheckForUpdates_Click(object? sender,EventArgs e) {
+  private async void mnuCheckForUpdates_Click(object? sender,RoutedEventArgs e) {
     await HelpHelper.mnuCheckForUpdates(this,_profile);
   }
 
-  private void mnuLicense_Click(object? sender,EventArgs e) {
+  private void mnuLicense_Click(object? sender,RoutedEventArgs e) {
     LicenseHelper.AfficherLicence(this,_licenseService,_profile);
   }
-  private void mnuImportLicense_Click(object? sender,EventArgs e) {
+  private void mnuImportLicense_Click(object? sender,RoutedEventArgs e) {
     LicenseHelper.ImporterLicence(this,_licenseService);
   }
 }

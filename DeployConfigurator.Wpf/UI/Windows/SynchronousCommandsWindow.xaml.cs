@@ -42,11 +42,14 @@ public partial class SynchronousCommandsWindow: Window {
       List<SynchronousCommandConfiguration> firstLogonCommands) {
     InitializeComponent();
 
-    ThemeManager.SetTheme(AppTheme.Dark);
+    ThemeManager.ApplyTheme(this);
 
     // ============================================================
     // INITIALISATION DES TYPES DE COMMANDES
     // ============================================================
+
+    ConfigureGrid(gridWindowsPeCommands);
+    ConfigureGrid(gridFirstLogonCommands);
 
     cmbEditType.ItemsSource = Enum.GetValues<SynchronousCommandType>();
 
@@ -213,12 +216,12 @@ public partial class SynchronousCommandsWindow: Window {
   // ============================================================
 
   private DataGrid CurrentGrid =>
-      tabCommands.SelectedIndex == 0
+      tabWindowsPeCommands.SelectedIndex == 0
           ? gridWindowsPeCommands
           : gridFirstLogonCommands;
 
   private List<SynchronousCommandConfiguration> CurrentList =>
-      tabCommands.SelectedIndex == 1
+      tabWindowsPeCommands.SelectedIndex == 0
           ? WindowsPeCommands
           : FirstLogonCommands;
 

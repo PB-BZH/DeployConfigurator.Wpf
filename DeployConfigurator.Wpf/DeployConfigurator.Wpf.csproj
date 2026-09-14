@@ -17,6 +17,7 @@
 		<AssemblyVersion>1.0.0.0</AssemblyVersion>
 		<FileVersion>1.0.0.0</FileVersion>
 		<InformationalVersion>1.0.0</InformationalVersion>
+		<ApplicationManifest>app.manifest</ApplicationManifest>
 
 	</PropertyGroup>
 	<ItemGroup>
@@ -30,7 +31,31 @@
 	</ItemGroup>
 
 	<ItemGroup>
-		<Content Include="Ressources\Applicaton.ico" />
+	  <None Remove="Ressources\alarme.png" />
+	  <None Remove="Ressources\archive.png" />
+	  <None Remove="Ressources\build.png" />
+	  <None Remove="Ressources\cd.png" />
+	  <None Remove="Ressources\check.png" />
+	  <None Remove="Ressources\CopyFile.png" />
+	  <None Remove="Ressources\deploy.png" />
+	  <None Remove="Ressources\done.png" />
+	  <None Remove="Ressources\erreur.png" />
+	  <None Remove="Ressources\fail.png" />
+	  <None Remove="Ressources\gear.png" />
+	  <None Remove="Ressources\hard_disk.png" />
+	  <None Remove="Ressources\ok.png" />
+	  <None Remove="Ressources\pause.png" />
+	  <None Remove="Ressources\ready.png" />
+	  <None Remove="Ressources\resume.png" />
+	  <None Remove="Ressources\stop.png" />
+	  <None Remove="Ressources\success.png" />
+	  <None Remove="Ressources\usb.png" />
+	  <None Remove="Ressources\wait.png" />
+	  <None Remove="Ressources\warning.png" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<Resource Include="Ressources\archive.png" />
 	</ItemGroup>
 
 	<ItemGroup>
@@ -55,6 +80,30 @@
 		<Reference Include="PB.BZH.Licensing.Wpf">
 			<HintPath>..\..\PB.BZH.Licensing.Wpf\PB.BZH.Licensing.Wpf\bin\Release\net10.0-windows\PB.BZH.Licensing.Wpf.dll</HintPath>
 		</Reference>
+	</ItemGroup>
+
+
+	<ItemGroup>
+	  <Resource Include="Ressources\alarme.png" />
+	  <Resource Include="Ressources\build.png" />
+	  <Resource Include="Ressources\cd.png" />
+	  <Resource Include="Ressources\check.png" />
+	  <Resource Include="Ressources\CopyFile.png" />
+	  <Resource Include="Ressources\deploy.png" />
+	  <Resource Include="Ressources\done.png" />
+	  <Resource Include="Ressources\erreur.png" />
+	  <Resource Include="Ressources\fail.png" />
+	  <Resource Include="Ressources\gear.png" />
+	  <Resource Include="Ressources\hard_disk.png" />
+	  <Resource Include="Ressources\ok.png" />
+	  <Resource Include="Ressources\pause.png" />
+	  <Resource Include="Ressources\ready.png" />
+	  <Resource Include="Ressources\resume.png" />
+	  <Resource Include="Ressources\stop.png" />
+	  <Resource Include="Ressources\success.png" />
+	  <Resource Include="Ressources\usb.png" />
+	  <Resource Include="Ressources\wait.png" />
+	  <Resource Include="Ressources\warning.png" />
 	</ItemGroup>
 
 	<ItemGroup>

@@ -38,26 +38,43 @@ public class DeploymentPackageBuilder {
 
   private readonly List<string> _copiedFiles = [];
 
-  public void GeneratePackage(DeploymentProfile profile) {
-    string outputRoot = Path.Combine(
-        profile.Package.OutputDirectory,
-        profile.Package.PackageName
-    );
+  public void GeneratePackage(DeploymentProfile profile,Action<int,string>? progress = null) {
 
-    string templatesRoot = Path.Combine(
-        AppDomain.CurrentDomain.BaseDirectory,
-        "Templates"
-    );
+    // ============================================================
+    // INITIALISATION
+    // ============================================================
+
+    progress?.Invoke(10,"Preparing package...");
+
+    string outputRoot = Path.Combine(profile.Package.OutputDirectory,profile.Package.PackageName);
+    string templatesRoot = Path.Combine(AppDomain.CurrentDomain.BaseDirectory,"Templates");
 
     Directory.CreateDirectory(outputRoot);
 
+
+    // ============================================================
+    // STRUCTURE DEPLOY
+    // ============================================================
+
+    progress?.Invoke(20,"Creating Deploy structure...");
+
     GenerateDeployStructure(outputRoot,profile);
 
-    GenerateConfigurationFiles(
-        outputRoot,
-        templatesRoot,
-        profile
-    );
+
+    // ============================================================
+    // FICHIERS DE CONFIGURATION
+    // ============================================================
+
+    progress?.Invoke(65,"Generating configuration files...");
+
+    GenerateConfigurationFiles(outputRoot,templatesRoot,profile);
+
+
+    // ============================================================
+    // MANIFEST
+    // ============================================================
+
+    progress?.Invoke(90,"Generating package manifest...");
 
     GenerateManifest(outputRoot,profile);
   }
