@@ -75,9 +75,9 @@
                 <MenuItem Header="Open profile"
                           Click="menuOpenProfile_Click" />
                 <MenuItem Header="Save profile"
-                          Click="menuSaveProfile_Click" />
+                          Click="mnuSaveProfile_Click" />
                 <MenuItem Header="Save profile as"
-                          Click="menuSaveProfileAs_Click" />
+                          Click="mnuSaveProfileAs_Click" />
                 <Separator />
                 <MenuItem Header="Print selected view"
                           Click="menuPrintSelectedView_Click" />
@@ -156,7 +156,7 @@
                           Header="Synchronous Commands"
                           Click="mnuSynchronousCommands_Click" />
                 <Separator />
-                <MenuItem x:Name="ThemeMode"
+                <MenuItem x:Name="mnuDarkTheme"
                           Header="Theme sombre"
                           Click="mnuThemeSombre_click"
                           IsCheckable="True" />
@@ -1031,13 +1031,13 @@
                                  VerticalContentAlignment="Center"
                                  Height="25" />
 
-                        <Button x:Name="btnBrowseSetupConfigSourcePath"
+                        <Button x:Name="btnBrowseSetupConfig"
                                 Grid.Column="10"
                                 Grid.Row="2"
                                 Content="..."
                                 Width="32"
                                 Height="25"
-                                Click="btnBrowseSetupConfigSourcePath_Click" />
+                                Click="btnBrowseSetupConfig_Click" />
                     </Grid>
                 </Grid>
             </GroupBox>
@@ -1191,8 +1191,8 @@
                             Grid.ColumnSpan="3"
                             Grid.Row="5"
                             Content="Build Windows Media"
+                            Style="{DynamicResource ActionButtonStyle}"
                             Width="150"
-                            Height="25"
                             Click="btnBuildWindowsMedia_Click" />
 
                     <Button x:Name="btnOpenMediaFolder"
@@ -1200,8 +1200,8 @@
                             Grid.ColumnSpan="4"
                             Grid.Row="5"
                             Content="Open Media Folder"
+                            Style="{DynamicResource ActionButtonStyle}"
                             Width="150"
-                            Height="25"
                             Click="btnOpenMediaFolder_Click" />
 
                     <CheckBox x:Name="chkPrepareUsbMedia"
@@ -1228,8 +1228,8 @@
                             Grid.ColumnSpan="3"
                             Grid.Row="9"
                             Content="Build ISO"
+                            Style="{DynamicResource ActionButtonStyle}"
                             Width="150"
-                            Height="25"
                             IsEnabled="{Binding IsChecked, ElementName=chkPrepareUsbMedia}"
                             Click="btnBuildIso_Click" />
                 </Grid>
@@ -1238,87 +1238,125 @@
                       Grid.Row="2"
                       VerticalAlignment="Top"
                       Height="179">
-                <Grid Margin="10,0,10,0"
-                      Height="169">
+
+                <Grid Margin="10,0,10,5">
+
                     <Grid.RowDefinitions>
                         <RowDefinition Height="32" />
                         <RowDefinition Height="32" />
                         <RowDefinition Height="32" />
-                        <RowDefinition Height="32" />
+                        <RowDefinition Height="*" />
                         <RowDefinition Height="32" />
                     </Grid.RowDefinitions>
+
                     <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="auto" />
-                        <ColumnDefinition Width="20" />
-                        <ColumnDefinition Width="auto" />
-                        <ColumnDefinition Width="20" />
-                        <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="*" />
                     </Grid.ColumnDefinitions>
+
+                    <!-- ============================================================
+                         LIGNE 1
+                         ============================================================ -->
+
                     <CheckBox x:Name="chkRunDetachUsb"
                               Grid.Row="0"
                               Grid.Column="0"
-                              Content="Detach USB" />
+                              Content="Detach USB"
+                              VerticalAlignment="Center" />
 
                     <CheckBox x:Name="chkRunReorgVolumes"
                               Grid.Row="0"
-                              Grid.Column="2"
-                              Content="Reorg Volumes" />
+                              Grid.Column="1"
+                              Content="Reorg Volumes"
+                              VerticalAlignment="Center" />
 
                     <CheckBox x:Name="chkRunWifi"
                               Grid.Row="0"
-                              Grid.Column="4"
-                              Content="WiFi / Network" />
+                              Grid.Column="2"
+                              Content="WiFi / Network"
+                              VerticalAlignment="Center" />
+
+
+                    <!-- ============================================================
+                         LIGNE 2
+                         ============================================================ -->
 
                     <CheckBox x:Name="chkRunDrivers"
-                              Grid.Column="0"
                               Grid.Row="1"
-                              Content="Install Drivers" />
+                              Grid.Column="0"
+                              Content="Install Drivers"
+                              VerticalAlignment="Center" />
 
                     <CheckBox x:Name="chkRunWindowsUpdateDrivers"
-                              Grid.Column="2"
                               Grid.Row="1"
-                              Content="Windows Update" />
+                              Grid.Column="1"
+                              Content="Windows Update"
+                              VerticalAlignment="Center" />
 
                     <CheckBox x:Name="chkRunPostInstall"
-                              Grid.Column="4"
                               Grid.Row="1"
-                              Content="Post-Install" />
+                              Grid.Column="2"
+                              Content="Post-Install"
+                              VerticalAlignment="Center" />
+
+
+                    <!-- ============================================================
+                     LIGNE 3
+                     ============================================================ -->
 
                     <CheckBox x:Name="chkRunSoftwares"
-                              Grid.Column="0"
                               Grid.Row="2"
-                              Content="Logiciels" />
+                              Grid.Column="0"
+                              Content="Logiciels"
+                              VerticalAlignment="Center" />
 
                     <CheckBox x:Name="chkRunM365"
-                              Grid.Column="2"
                               Grid.Row="2"
-                              Content="Microsoft 365" />
+                              Grid.Column="1"
+                              Content="Microsoft 365"
+                              VerticalAlignment="Center" />
 
                     <CheckBox x:Name="chkRunCleanup"
-                              Grid.Column="4"
                               Grid.Row="2"
-                              Content="Final Cleanup" />
+                              Grid.Column="2"
+                              Content="Final Cleanup"
+                              VerticalAlignment="Center" />
 
-                    <StackPanel Grid.Column="0"
-                                Grid.Row="4"
-                                Grid.ColumnSpan="5"
-                                Orientation="Horizontal"
-                                Margin="52,0,51,0">
+
+                    <!-- ============================================================
+                         VALIDATION
+                         ============================================================ -->
+
+                    <Grid Grid.Row="4"
+                          Grid.ColumnSpan="3">
+
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="Auto" />
+                            <ColumnDefinition Width="10" />
+                            
+                        </Grid.ColumnDefinitions>
+
                         <Label x:Name="lblOrchestrationPending"
                                Grid.Column="0"
-                               Content="Changes pending"
-                               Style="{DynamicResource RedLabel}"
+                               Content="Changes pending use [Apply All] to apply"
+                               Style="{DynamicResource OrangeLabel}"
                                Tag="KeepForeColor"
+                               HorizontalAlignment="left"
                                VerticalAlignment="Center"
-                               Margin="20,0,20,5" />
+                               Margin="0,0,10,0" />
 
                         <Button x:Name="btnApply"
+                                Grid.Column="1"
                                 Content="Apply all"
+                                Style="{DynamicResource ActionButtonStyle}"
                                 Width="75"
                                 Height="25"
-                                Margin="20,0,20,5"
-                                Click="btnApply_Click" />
-                    </StackPanel>
+                                HorizontalAlignment="Center"
+                                Click="btnApplyOrchestration_Click" />
+
+                    </Grid>
 
                 </Grid>
             </GroupBox>
@@ -1449,36 +1487,42 @@
                         Width="150"
                         Height="25"
                         Margin="5,0,5,0"
+                        Style="{DynamicResource ActionButtonStyle}"
                         Click="btnPrepareUSB_Click" />
                 <Button x:Name="btnOpenPackageFolder"
                         Content="Open Package Folder"
                         Width="150"
                         Height="25"
                         Margin="5,0,5,0"
+                        Style="{DynamicResource ActionButtonStyle}"
                         Click="btnOpenPackageFolder_Click" />
                 <Button x:Name="btnBuildPackage"
                         Content="Build Package"
                         Width="150"
                         Height="25"
                         Margin="5,0,5,0"
+                        Style="{DynamicResource ActionButtonStyle}"
                         Click="btnBuildPackage_Click" />
-                <Button x:Name="btnOpenBuildAllPackages"
+                <Button x:Name="btnBuildPackageFolder"
                         Content="Open Build All Packages"
                         Width="150"
                         Height="25"
                         Margin="5,0,5,0"
-                        Click="btnOpenBuildAllPackages_Click" />
+                        Style="{DynamicResource ActionButtonStyle}"
+                        Click="btnBuildPackageFolder_Click" />
                 <Button x:Name="btnBuildAll"
                         Content="Build All"
                         Width="150"
                         Height="25"
                         Margin="5,0,5,0"
+                        Style="{DynamicResource ActionButtonStyle}"
                         Click="btnBuildAll_Click" />
                 <Button x:Name="btnCancelBuild"
                         Content="Cancel Build"
                         Width="auto"
                         Height="25"
                         Margin="5,0,5,0"
+                        Style="{DynamicResource ActionButtonStyle}"
                         Click="btnCancelBuild_Click" />
             </StackPanel>
             <StackPanel Grid.Row="2"
@@ -1497,6 +1541,7 @@
                 <Button x:Name="btnPauseResume"
                         Width="40"
                         Height="25"
+                        Style="{DynamicResource ActionButtonStyle}"
                         Margin="5"
                         Click="btnPauseResume_Click">
 
@@ -1516,6 +1561,7 @@
                         Content="Print"
                         Margin="0,0,10,0"
                         Width="150"
+                        Style="{DynamicResource ActionButtonStyle}"
                         Click="btnPrintSelectedView_Click" />
                 <Label x:Name="lblBuildProgress"
                        Content="Progression"
@@ -1543,7 +1589,8 @@
                     ScrollViewer.VerticalScrollBarVisibility="Auto"
                     ScrollViewer.HorizontalScrollBarVisibility="Auto"
                     Grid.Row="3"
-                    d:LayoutOverrides="VerticalAlignment">
+                    d:LayoutOverrides="VerticalAlignment"
+                    Grid.RowSpan="1">
 
             <!-- =========================================================
              DISKPREP
@@ -1552,7 +1599,9 @@
             <TabItem Header="diskprep.cmd">
                 <controls:PreviewEditor x:Name="previewDiskPrep"
                                         EditorMouseDoubleClick="txtPreview_DoubleClick"
-                                        OpenInNotepadPlusPlusRequested="Preview_OpenInNotepadPlusPlusRequested" />
+                                        OpenInNotepadPlusPlusRequested="Preview_OpenInNotepadPlusPlusRequested"
+                                        ScrollViewer.VerticalScrollBarVisibility="Auto"
+                                        ScrollViewer.HorizontalScrollBarVisibility="Auto" />
             </TabItem>
 
             <!-- =========================================================

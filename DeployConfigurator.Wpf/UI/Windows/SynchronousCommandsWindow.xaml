@@ -126,7 +126,7 @@
                     <ColumnDefinition Width="10" />
                     <ColumnDefinition Width="*" />
                     <ColumnDefinition Width="10" />
-                    <ColumnDefinition Width="100" />
+                    <ColumnDefinition Width="Auto" />
                 </Grid.ColumnDefinitions>
                 <Label x:Name="lblEditCommandLine"
                        Grid.Column="0"
@@ -136,12 +136,15 @@
                 <TextBox x:Name="txtEditCommandLine"
                          Grid.Column="2"
                          Height="Auto"
+                         TextWrapping="Wrap"
                          VerticalScrollBarVisibility="Visible"
+                         HorizontalScrollBarVisibility="Auto"
                          VerticalContentAlignment="Top" />
 
                 <Button x:Name="btnApplyCommandChanges"
                         Content="Apply change"
                         Grid.Column="4"
+                        Width="Auto"
                         Margin="5"
                         VerticalAlignment="Top"
                         Click="btnApplyCommandChanges_Click" />

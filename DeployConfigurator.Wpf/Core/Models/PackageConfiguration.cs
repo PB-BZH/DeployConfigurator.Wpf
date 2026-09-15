@@ -38,9 +38,6 @@ public class PackageConfiguration {
   public bool IncludeWinPE { get; set; } = false;
   public string DriversSourcePath { get; set; } = "";
   public string ApplicationsSourcePath { get; set; } = "";
-  public string ScriptsSourcePath { get; set; } = "";
-  public string WinPESourcePath { get; set; } = "";
-
   public bool IncludeSetupScripts { get; set; } = true;
   public bool IncludeSetupConfig { get; set; } = true;
 

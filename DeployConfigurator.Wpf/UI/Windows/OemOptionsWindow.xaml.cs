@@ -3,7 +3,7 @@ using System.Windows;
 using System.Windows.Controls;
 using DeployConfigurator.Wpf.Core.Models;
 using Microsoft.Win32;
-using PB.BZH.Help.Wpf.UI.Theming;
+using PB.BZH.Theme.Theming;
 
 namespace DeployConfigurator.Wpf.UI.Windows;
 

@@ -1,6 +1,6 @@
 using System.Windows;
 using DeployConfigurator.Wpf.Core.Models;
-using PB.BZH.Help.Wpf.UI.Theming;
+using PB.BZH.Theme.Theming;
 
 namespace DeployConfigurator.Wpf.UI.Windows;
 
@@ -59,7 +59,6 @@ public partial class UsbTargetConfirmWindow: Window {
     DialogResult = true;
   }
 
-
   private void UpdateSummary() {
     txtSummary.Text =
       $"Device: {cmbUsbDevices.Text}" +
@@ -71,7 +70,6 @@ public partial class UsbTargetConfirmWindow: Window {
       $"Target: {cmbTargetSystem.Text} | " +
       $"FS: {cmbSystemFiles.Text}";
   }
-
 
   private void btnCancel_Click(
     object sender,

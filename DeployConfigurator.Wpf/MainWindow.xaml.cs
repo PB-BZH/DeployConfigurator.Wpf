@@ -1,5 +1,4 @@
 using System.Diagnostics;
-using System.Drawing.Printing;
 using System.IO;
 using System.IO.Compression;
 using System.Text;
@@ -21,8 +20,8 @@ using DeployConfigurator.Wpf.UI.Controls;
 using DeployConfigurator.Wpf.UI.Helpers;
 using DeployConfigurator.Wpf.UI.Windows;
 using Microsoft.Win32;
-using PB.BZH.Help.Wpf.UI.Theming;
 using PB.BZH.Licensing.Core.Services;
+using PB.BZH.Theme.Theming;
 using Brushes = System.Windows.Media.Brushes;
 using Path = System.IO.Path;
 
@@ -37,20 +36,11 @@ public partial class MainWindow: Window {
 
   private bool _livePreviewReady;
   private bool _isUpdatingPreview;
-  private bool _isHighlighting;
   private bool _hasValidationError;
-
   private string _currentProfilePath = "";
   private string _fullPreviewText = "";
-  private ToolTip _toolTip = new();
-
   private readonly HashSet<string> _collapsedSections = [];
-
-  private PrintDocument? _printDocument;
-  private string[] _printLines = [];
-  private int _currentPrintLine;
   private CancellationTokenSource? _buildCancellation;
-
   private PreviewDocumentType _activePreviewDocument = PreviewDocumentType.Diskprep;
   private int _refreshCount;
   private bool _isRefreshingPreview;
@@ -81,8 +71,6 @@ public partial class MainWindow: Window {
   private readonly Lock _usbLiveReportLock = new();
   private int _currentStepProgressStart;
   private int _currentStepProgressSpan;
-
-  private const string WebCategoryFolderName = "msi-software-packager";
   private readonly LicenseService _licenseService;
   private readonly PreviewSyntaxHighlighter _syntaxHighlighter = new();
 
@@ -93,7 +81,7 @@ public partial class MainWindow: Window {
     InitializeComponent();
     _licenseService = LicenseHelper.CreerLicenseService(_profile);
 
-    ThemeMode.IsChecked = true;
+    mnuDarkTheme.IsChecked = true;
     DarkTheme();
 
     #region UI Initialization
@@ -113,8 +101,7 @@ public partial class MainWindow: Window {
     imgPauseResume.Source = LoadImageResource("ready.png");
     #endregion
   }
-  #region élements ajoutés
-  // ---------------------
+
   private void MainForm_KeyDown(object? sender,KeyEventArgs e) {
     if (Keyboard.Modifiers.HasFlag(ModifierKeys.Control) && e.Key == Key.F) {
       txtSearch.Focus();
@@ -138,34 +125,27 @@ public partial class MainWindow: Window {
     if (sender is not PreviewEditor preview)
       return;
 
-    string fileName;
+    string? fileName = preview switch {
+      _ when preview == previewDiskPrep => "diskprep.cmd",
+      _ when preview == previewSetupComplete => "SetupComplete.cmd",
+      _ when preview == previewOrchestrator_resume => "Orchestrator_resume.cmd",
+      _ when preview == previewAutoUnattend => "autounattend.xml",
+      _ when preview == previewUnattend => "unattend.xml",
+      _ when preview == previewProfileDeployJson => "profile.deploy.json",
+      _ when preview == previewprofileBuildReport => "BuildReport.txt",
+      _ when preview == previewBuildLog => "BuildLog.txt",
+      _ => null
+    };
 
-    if (preview == previewDiskPrep)
-      fileName = "diskprep.cmd";
-    else if (preview == previewSetupComplete)
-      fileName = "SetupComplete.cmd";
-    else if (preview == previewOrchestrator_resume)
-      fileName = "Orchestrator_resume.cmd";
-    else if (preview == previewAutoUnattend)
-      fileName = "autounattend.xml";
-    else if (preview == previewUnattend)
-      fileName = "unattend.xml";
-    else if (preview == previewProfileDeployJson)
-      fileName = "profile.deploy.json";
-    else if (preview == previewprofileBuildReport)
-      fileName = "BuildReport.txt";
-    else if (preview == previewBuildLog)
-      fileName = "BuildLog.txt";
-    else
+    if (fileName == null)
       return;
 
     OpenTextInNotepadPlusPlus(GetRichText(preview.Editor),fileName);
   }
-
   private void DarkTheme() {
 
     ThemeManager.SetTheme(
-      ThemeMode.IsChecked
+      mnuDarkTheme.IsChecked
         ? AppTheme.Dark
         : AppTheme.Light);
   }
@@ -403,49 +383,29 @@ public partial class MainWindow: Window {
     }
 
     else if (control is CheckBox chk) {
-
-      chk.LostKeyboardFocus +=
-        DeferredRefresh_LostKeyboardFocus;
-
+      chk.LostKeyboardFocus += DeferredRefresh_LostKeyboardFocus;
       chk.KeyDown +=
         (s,e) => {
-
           if (e.Key == Key.Enter) {
-
             e.Handled = true;
-
-            ConfigurationChanged(
-              s,
-              e);
+            ConfigurationChanged(s,e);
           }
         };
     }
-
     else if (control is ComboBox cmb) {
-
-      cmb.SelectionChanged +=
-        ConfigurationChanged;
+      cmb.SelectionChanged += ConfigurationChanged;
     }
-
     else if (control is NumericUpDown num) {
-
       num.ValueChanged +=
         ConfigurationChanged;
     }
   }
 
-  private void DeferredRefresh_KeyDown(
-  object sender,
-  KeyEventArgs e) {
-
+  private void DeferredRefresh_KeyDown(object sender,KeyEventArgs e) {
     if (e.Key != Key.Enter)
       return;
-
     e.Handled = true;
-
-    ConfigurationChanged(
-      sender,
-      e);
+    ConfigurationChanged(sender,e);
   }
 
   private void DeferredRefresh_LostKeyboardFocus(
@@ -608,8 +568,6 @@ public partial class MainWindow: Window {
 
     _profile.Package.DriversSourcePath = txtDriversSourcePath.Text;
     _profile.Package.ApplicationsSourcePath = txtApplicationsSourcePath.Text;
-    //_profile.Package.ScriptsSourcePath = txtScriptsSourcePath.Text;
-    //_profile.Package.WinPESourcePath = txtWinPESourcePath.Text;
     _profile.Package.IncludeSetupScripts = chkIncludeSetupScripts.IsChecked == true;
     _profile.Package.IncludeSetupConfig = chkIncludeSetupConfig.IsChecked == true;
     _profile.Package.SetupScriptsSourcePath = txtSetupScriptsSourcePath.Text;
@@ -765,13 +723,6 @@ public partial class MainWindow: Window {
         _profile.Package.SetupConfigSourcePath
     );
 
-    AppendResourceStatus(
-        sb,
-        "WinPE",
-        _profile.Package.IncludeWinPE,
-        _profile.Package.WinPESourcePath
-    );
-
     sb.AppendLine();
     sb.AppendLine("=== VALIDATION ===");
     sb.AppendLine();
@@ -899,35 +850,21 @@ public partial class MainWindow: Window {
   }
 
   private void ApplySyntaxHighlighting() {
-
-    RichTextBox textBox =
-      CurrentPreviewTextBox;
+    RichTextBox textBox = CurrentPreviewTextBox;
 
     switch (_activePreviewDocument) {
-
       case PreviewDocumentType.AutoUnattend:
-
       case PreviewDocumentType.Unattend:
-
         _syntaxHighlighter.ApplyXml(
           textBox);
-
         break;
-
 
       case PreviewDocumentType.ProfileJson:
-
-        _syntaxHighlighter.ApplyJson(
-          textBox);
-
+        _syntaxHighlighter.ApplyJson(textBox);
         break;
 
-
       default:
-
-        _syntaxHighlighter.ApplyCmd(
-          textBox);
-
+        _syntaxHighlighter.ApplyCmd(textBox);
         break;
     }
   }
@@ -953,9 +890,6 @@ public partial class MainWindow: Window {
         SetRichText(textBox,result);
 
       ApplySyntaxHighlighting();
-
-      //pnlLineNumbers.Invalidate();
-      //pnlMiniMap.Invalidate();
     }
     catch (Exception ex) {
       string message =
@@ -970,8 +904,6 @@ public partial class MainWindow: Window {
       _isUpdatingPreview = false;
     }
   }
-
-
 
   private static void SetItemChecked(ListBox listBox,int index,bool isChecked) {
     if (index < 0 || index >= listBox.Items.Count) {
@@ -1068,8 +1000,6 @@ public partial class MainWindow: Window {
 
     txtDriversSourcePath.Text = _profile.Package.DriversSourcePath;
     txtApplicationsSourcePath.Text = _profile.Package.ApplicationsSourcePath;
-    //txtScriptsSourcePath.Text = _profile.Package.ScriptsSourcePath;
-    //txtWinPESourcePath.Text = _profile.Package.WinPESourcePath;
 
     chkIncludeSetupScripts.IsChecked = _profile.Package.IncludeSetupScripts;
     chkIncludeSetupConfig.IsChecked = _profile.Package.IncludeSetupConfig;
@@ -1227,14 +1157,11 @@ public partial class MainWindow: Window {
     txtSetupScriptsSourcePath.IsEnabled = chkIncludeScripts.IsChecked == true;
     btnBrowseSetupScriptsSourcePath.IsEnabled = chkIncludeScripts.IsChecked == true;
 
-    //txtWinPESourcePath.IsEnabled = chkIncludeWinPE.IsChecked == true;
-    //btnBrowseWinPE.IsEnabled = chkIncludeWinPE.IsChecked == true;
-
     txtSetupScriptsSourcePath.IsEnabled = chkIncludeSetupScripts.IsChecked == true;
     btnBrowseSetupScriptsSourcePath.IsEnabled = chkIncludeSetupScripts.IsChecked == true;
 
     txtSetupConfigSourcePath.IsEnabled = chkIncludeSetupConfig.IsChecked == true;
-    btnBrowseSetupConfigSourcePath.IsEnabled = chkIncludeSetupConfig.IsChecked == true;
+    btnBrowseSetupConfig.IsEnabled = chkIncludeSetupConfig.IsChecked == true;
   }
 
   private void UpdateStatusBar() {
@@ -1375,7 +1302,15 @@ public partial class MainWindow: Window {
     BrowseFolderInto(txtDriversSourcePath);
   }
 
+  private async void mnuBuildWindowsMedia_Click(object sender,RoutedEventArgs e) {
+    await BuildWindowsMedia();
+  }
+
   private async void btnBuildWindowsMedia_Click(object sender,RoutedEventArgs e) {
+    await BuildWindowsMedia();
+  }
+
+  private async Task BuildWindowsMedia() {
 
     // ============================================================
     // BUILD WINDOWS MEDIA
@@ -1466,34 +1401,6 @@ public partial class MainWindow: Window {
     await BuildPackage();
   }
 
-  private void mnuBuildWindowsMedia_Click(object sender,RoutedEventArgs e) {
-
-  }
-
-  private void mnuBuildAll_Click(object sender,RoutedEventArgs e) {
-
-  }
-
-  private void mnuPrepareUsb_Click(object sender,RoutedEventArgs e) {
-
-  }
-
-  private void mnuOpenPackageFolder_Click(object sender,RoutedEventArgs e) {
-
-  }
-
-  private void mnuOpenBuildFolder_Click(object sender,RoutedEventArgs e) {
-
-  }
-
-  private void mnuEditWithNotepadPlusPlus_Click(object sender,RoutedEventArgs e) {
-
-  }
-
-  private void menuSaveProfileAs_Click(object sender,RoutedEventArgs e) {
-
-  }
-
   private static void OpenFileInNotepadPlusPlus(string path) {
     Process.Start(new ProcessStartInfo {
       FileName = @"C:\Program Files\Notepad++\notepad++.exe",
@@ -1521,48 +1428,35 @@ public partial class MainWindow: Window {
   }
 
   private void mnuEditFileWithNotepadPlusPlus_Click(object sender,RoutedEventArgs e) {
-    if (sender is not MenuItem menuItem || menuItem.Tag is not string document) {
+
+    if (sender is not MenuItem menuItem || menuItem.Tag is not string document)
+      return;
+
+    if (document == "CurrentProfile" &&
+        (string.IsNullOrWhiteSpace(_currentProfilePath) || !File.Exists(_currentProfilePath))) {
+
+      MessageBox.Show("Aucun fichier profil JSON chargé.");
       return;
     }
-    switch (document) {
-      case "diskprep.cmd":
-        OpenTextInNotepadPlusPlus(GetRichText(previewDiskPrep.Editor),"diskprep.cmd");
-        break;
 
-      case "SetupComplete.cmd":
-        OpenTextInNotepadPlusPlus(GetRichText(previewSetupComplete.Editor),"SetupComplete.cmd");
-        break;
+    (string Text,string FileName)? file = document switch {
+      "diskprep.cmd" => (GetRichText(previewDiskPrep.Editor),"diskprep.cmd"),
+      "SetupComplete.cmd" => (GetRichText(previewSetupComplete.Editor),"SetupComplete.cmd"),
+      "orchestrator_resume.cmd" => (GetRichText(previewOrchestrator_resume.Editor),"orchestrator_resume.cmd"),
+      "autounattend.xml" => (GetRichText(previewAutoUnattend.Editor),"autounattend.xml"),
+      "unattend.xml" => (GetRichText(previewUnattend.Editor),"unattend.xml"),
+      "BuildReport" => (GetRichText(previewprofileBuildReport.Editor),"BuildReport.txt"),
+      "BuildLog" => (GetRichText(previewBuildLog.Editor),"BuildLog.txt"),
+      "CurrentProfile" => (File.ReadAllText(_currentProfilePath!),"profile.deploy.json"),
+      _ => null
+    };
 
-      case "orchestrator_resume.cmd":
-        OpenTextInNotepadPlusPlus(GetRichText(previewOrchestrator_resume.Editor),"orchestrator_resume.cmd");
-        break;
+    if (file == null)
+      return;
 
-      case "autounattend.xml":
-        OpenTextInNotepadPlusPlus(GetRichText(previewAutoUnattend.Editor),"autounattend.xml");
-        break;
-
-      case "unattend.xml":
-        OpenTextInNotepadPlusPlus(GetRichText(previewUnattend.Editor),"unattend.xml");
-        break;
-
-
-      case "BuildReport":
-        OpenTextInNotepadPlusPlus(GetRichText(previewprofileBuildReport.Editor),"BuildReport.txt");
-        break;
-
-      case "BuildLog":
-        OpenTextInNotepadPlusPlus(GetRichText(previewBuildLog.Editor),"BuildLog.txt");
-        break;
-
-      case "CurrentProfile":
-        if (string.IsNullOrWhiteSpace(_currentProfilePath) || !File.Exists(_currentProfilePath)) {
-          MessageBox.Show("Aucun fichier profil JSON chargé.");
-          return;
-        }
-        OpenTextInNotepadPlusPlus(File.ReadAllText(_currentProfilePath),"profile.deploy.json");
-        break;
-    }
+    OpenTextInNotepadPlusPlus(file.Value.Text,file.Value.FileName);
   }
+
   private void mnuSynchronousCommands_Click(object sender,RoutedEventArgs e) {
     SynchronousCommandsWindow window = new(_profile.WindowsPeCommands,_profile.FirstLogonCommands);
 
@@ -1596,12 +1490,12 @@ public partial class MainWindow: Window {
     await HelpHelper.mnuCheckForUpdates(this,_profile);
   }
 
-  private void btnOpenBuildAllPackages_Click(object sender,RoutedEventArgs e) {
-
-  }
-
   private async void btnBuildPackage_Click(object sender,RoutedEventArgs e) {
     await BuildPackage();
+  }
+
+  private async void mnuPrepareUsb_Click(object sender,RoutedEventArgs e) {
+    await RunPrepareUsbPipelineAsync(DateTime.Now);
   }
 
   private async void btnPrepareUSB_Click(object sender,RoutedEventArgs e) {
@@ -1614,11 +1508,6 @@ public partial class MainWindow: Window {
       return;
     }
   }
-
-  private void btnBrowseSetupConfigSourcePath_Click(object sender,RoutedEventArgs e) {
-
-  }
-  #endregion
 
   // ===================================================
   //  Progression globale pour le processus de préparation USB
@@ -2585,10 +2474,30 @@ public partial class MainWindow: Window {
   }
 
   private static void SetRichText(RichTextBox richTextBox,string text) {
-    new TextRange(
-      richTextBox.Document.ContentStart,
-      richTextBox.Document.ContentEnd)
-      .Text = text;
+
+    richTextBox.Document.Blocks.Clear();
+
+    Paragraph paragraph = new() {
+      Margin = new Thickness(0),
+      LineHeight = 18,
+      LineStackingStrategy = LineStackingStrategy.BlockLineHeight
+    };
+
+    string normalizedText =
+      text.Replace("\r\n","\n").Replace('\r','\n');
+
+    string[] lines = normalizedText.Split('\n');
+
+    for (int i = 0;i < lines.Length;i++) {
+
+      paragraph.Inlines.Add(
+        new Run(lines[i]));
+
+      if (i < lines.Length - 1)
+        paragraph.Inlines.Add(new LineBreak());
+    }
+
+    richTextBox.Document.Blocks.Add(paragraph);
   }
 
   private void PreviewDiskPrep_OpenInNotepadPlusPlusRequested(object? sender,RoutedEventArgs e) {
@@ -3158,7 +3067,21 @@ public partial class MainWindow: Window {
     UpdateIsoOutputFromMediaFolder();
   }
 
+  private async void mnuBuildAll_Click(object sender,RoutedEventArgs e) {
+    bool flowControl = await BuildAll();
+    if (!flowControl) {
+      return;
+    }
+  }
+
   private async void btnBuildAll_Click(object sender,RoutedEventArgs e) {
+    bool flowControl = await BuildAll();
+    if (!flowControl) {
+      return;
+    }
+  }
+
+  private async Task<bool> BuildAll() {
     ApplyUiToProfile();
 
     if (!ValidateBuildReadiness()) {
@@ -3169,7 +3092,7 @@ public partial class MainWindow: Window {
           MessageBoxImage.Warning
       );
 
-      return;
+      return false;
     }
 
     progressBuild.Value = 0;
@@ -3216,6 +3139,8 @@ public partial class MainWindow: Window {
       btnBuildIso.IsEnabled = true;
       btnCancelBuild.IsEnabled = false;
     }
+
+    return true;
   }
 
   private void UpdateBuildProgress(int value,string message) {
@@ -3243,7 +3168,22 @@ public partial class MainWindow: Window {
     lblCurrentFile.Content = "";
   }
 
+  private void mnuOpenBuildFolder_Click(object sender,RoutedEventArgs e) {
+    bool flowControl = OpenMediaFolder();
+    if (!flowControl) {
+      return;
+    }
+  }
+
+
   private void btnOpenMediaFolder_Click(object sender,RoutedEventArgs e) {
+    bool flowControl = OpenMediaFolder();
+    if (!flowControl) {
+      return;
+    }
+  }
+
+  private bool OpenMediaFolder() {
     string path = txtMediaWorkingDirectory.Text;
 
     if (!Directory.Exists(path)) {
@@ -3254,13 +3194,14 @@ public partial class MainWindow: Window {
           MessageBoxImage.Warning
       );
 
-      return;
+      return false;
     }
 
     Process.Start(new ProcessStartInfo {
       FileName = path,
       UseShellExecute = true
     });
+    return true;
   }
 
   // ============================================================
@@ -3320,10 +3261,6 @@ public partial class MainWindow: Window {
     lblOrchestrationPending.Visibility = Visibility.Collapsed;
   }
 
-  private void btnBrowseSetupScripts_Click(object sender,RoutedEventArgs e) {
-    BrowseFolderInto(txtSetupScriptsSourcePath);
-  }
-
   private void btnBrowseSetupConfig_Click(object sender,RoutedEventArgs e) {
     BrowseFolderInto(txtSetupConfigSourcePath);
   }
@@ -3340,15 +3277,22 @@ public partial class MainWindow: Window {
     BrowseFolderInto(txtApplicationsSourcePath);
   }
 
-  //private void btnBrowseScripts_Click(object sender,RoutedEventArgs e) {
-  //  BrowseFolderInto(txtSetupScriptsSourcePath);
-  //}
+  private void mnuOpenPackageFolder_Click(object sender,RoutedEventArgs e) {
+    bool flowControl = OpenPackageFolder();
+    if (!flowControl) {
+      return;
+    }
+  }
 
-  //private void btnBrowseWinPE_Click(object sender,RoutedEventArgs e) {
-  //  BrowseFolderInto(txtWinPESourcePath);
-  //}
 
   private void btnOpenPackageFolder_Click(object sender,RoutedEventArgs e) {
+    bool flowControl = OpenPackageFolder();
+    if (!flowControl) {
+      return;
+    }
+  }
+
+  private bool OpenPackageFolder() {
     ApplyUiToProfile();
 
     if (string.IsNullOrWhiteSpace(_profile.Package.OutputDirectory)) {
@@ -3358,7 +3302,7 @@ public partial class MainWindow: Window {
           MessageBoxButton.OK,
           MessageBoxImage.Warning
       );
-      return;
+      return false;
     }
 
     string packagePath = Path.Combine(
@@ -3375,13 +3319,14 @@ public partial class MainWindow: Window {
           MessageBoxButton.OK,
           MessageBoxImage.Information
       );
-      return;
+      return false;
     }
 
     Process.Start(new ProcessStartInfo {
       FileName = packagePath,
       UseShellExecute = true
     });
+    return true;
   }
 
   private void txtPreview_TextChanged(object? sender,RoutedEventArgs e) {
@@ -3472,22 +3417,15 @@ public partial class MainWindow: Window {
     return true;
   }
 
-  private void menuSaveProfile_Click(object? sender,RoutedEventArgs e) {
+  private void mnuSaveProfile_Click(object? sender,RoutedEventArgs e) {
     ApplyUiToProfile();
 
-    SaveFileDialog dialog = new() {
-      Filter = "Deploy Profile (*.deploy.json)|*.deploy.json",
-      FileName = "default.deploy.json"
-    };
-
-    Owner = this;
-
-    if (dialog.ShowDialog() != true)
+    if (string.IsNullOrWhiteSpace(_currentProfilePath)) {
+      mnuSaveProfileAs_Click(sender,e);
       return;
+    }
 
-    ProfileSerializer.Save(dialog.FileName,_profile);
-
-    _currentProfilePath = dialog.FileName;
+    ProfileSerializer.Save(_currentProfilePath,_profile);
 
     UpdateStatusBar();
   }
@@ -3531,7 +3469,15 @@ public partial class MainWindow: Window {
     SetOperationStatus("REPRISE...");
   }
 
+
   private void btnBuildPackageFolder_Click(object sender,RoutedEventArgs e) {
+    bool flowControl = BuildPackageFolder();
+    if (!flowControl) {
+      return;
+    }
+  }
+
+  private bool BuildPackageFolder() {
     ApplyUiToProfile();
 
     string buildAllPath = _profile.WindowsMedia.MediaFolder;
@@ -3544,7 +3490,7 @@ public partial class MainWindow: Window {
           MessageBoxImage.Warning
       );
 
-      return;
+      return false;
     }
 
     if (!Directory.Exists(buildAllPath)) {
@@ -3557,13 +3503,14 @@ public partial class MainWindow: Window {
           MessageBoxImage.Information
       );
 
-      return;
+      return false;
     }
 
     Process.Start(new ProcessStartInfo {
       FileName = buildAllPath,
       UseShellExecute = true
     });
+    return true;
   }
 
   private void TogglePauseResume() {
@@ -3601,5 +3548,42 @@ public partial class MainWindow: Window {
   }
   private void mnuImportLicense_Click(object? sender,RoutedEventArgs e) {
     LicenseHelper.ImporterLicence(this,_licenseService);
+  }
+
+  private void mnuSaveProfileAs_Click(object? sender,RoutedEventArgs e) {
+    ApplyUiToProfile();
+
+    SaveFileDialog dialog = new() {
+      Title = "Save profile as",
+      Filter =
+        "Deploy Profile (*.deploy.json)|*.deploy.json|" +
+        "JSON files (*.json)|*.json|" +
+        "All files (*.*)|*.*",
+      DefaultExt = ".deploy.json",
+      AddExtension = true,
+      FileName =
+        string.IsNullOrWhiteSpace(_currentProfilePath)
+          ? "default.deploy.json"
+          : Path.GetFileName(_currentProfilePath)
+    };
+
+    if (!string.IsNullOrWhiteSpace(_currentProfilePath)) {
+      string? directory =
+        Path.GetDirectoryName(_currentProfilePath);
+
+      if (!string.IsNullOrWhiteSpace(directory) &&
+          Directory.Exists(directory)) {
+        dialog.InitialDirectory = directory;
+      }
+    }
+
+    if (dialog.ShowDialog(this) != true)
+      return;
+
+    ProfileSerializer.Save(dialog.FileName,_profile);
+
+    _currentProfilePath = dialog.FileName;
+
+    UpdateStatusBar();
   }
 }

@@ -80,6 +80,9 @@
 		<Reference Include="PB.BZH.Licensing.Wpf">
 			<HintPath>..\..\PB.BZH.Licensing.Wpf\PB.BZH.Licensing.Wpf\bin\Release\net10.0-windows\PB.BZH.Licensing.Wpf.dll</HintPath>
 		</Reference>
+		<Reference Include="PB.BZH.Theme">
+		  <HintPath>..\..\PB.BZH.Theming\PB.BZH.Theme\bin\Release\net10.0-windows\PB.BZH.Theme.dll</HintPath>
+		</Reference>
 	</ItemGroup>
 
 

@@ -467,60 +467,87 @@ public sealed class PreviewSyntaxHighlighter {
   // POSITION TEXTE → TEXTPointer WPF
   // ============================================================
 
-  private static TextPointer? GetTextPointerAtOffset(
-    TextPointer start,
-    int offset) {
+  private static TextPointer? GetTextPointerAtOffset(TextPointer start,int offset) {
 
-    TextPointer? navigator =
-      start;
+    if (offset < 0)
+      return null;
 
+    TextPointer? navigator = start;
     int currentOffset = 0;
 
     while (navigator is not null) {
 
-      if (
-        navigator.GetPointerContext(
-          System.Windows.Documents.LogicalDirection.Forward)
-        ==
-        TextPointerContext.Text) {
+      if (currentOffset == offset)
+        return navigator;
+
+      TextPointerContext context =
+        navigator.GetPointerContext(LogicalDirection.Forward);
+
+      // ============================================================
+      // TEXTE NORMAL
+      // ============================================================
+
+      if (context == TextPointerContext.Text) {
 
         string textRun =
-          navigator.GetTextInRun(
-            System.Windows.Documents.LogicalDirection.Forward);
+          navigator.GetTextInRun(LogicalDirection.Forward);
 
-        if (
-          currentOffset + textRun.Length
-          >=
-          offset) {
+        int remaining =
+          offset - currentOffset;
 
+        if (remaining <= textRun.Length) {
           return navigator.GetPositionAtOffset(
-            offset - currentOffset,
-            System.Windows.Documents.LogicalDirection.Forward);
+            remaining,
+            LogicalDirection.Forward);
         }
 
-        currentOffset +=
-          textRun.Length;
+        currentOffset += textRun.Length;
+
+        navigator =
+          navigator.GetPositionAtOffset(
+            textRun.Length,
+            LogicalDirection.Forward);
+
+        continue;
+      }
+
+      // ============================================================
+      // RETOUR À LA LIGNE
+      // ============================================================
+
+      if (context == TextPointerContext.ElementStart &&
+          navigator.GetAdjacentElement(LogicalDirection.Forward) is LineBreak lineBreak) {
+
+        currentOffset++;
+
+        if (currentOffset == offset)
+          return lineBreak.ElementEnd;
+
+        navigator = lineBreak.ElementEnd;
+
+        continue;
       }
 
       navigator =
         navigator.GetNextContextPosition(
-          System.Windows.Documents.LogicalDirection.Forward);
+          LogicalDirection.Forward);
     }
 
     return null;
   }
 
-
   // ============================================================
   // TEXTE DU RICHTEXTBOX
   // ============================================================
 
-  private static string GetText(
-    RichTextBox textBox) {
+  private static string GetText(RichTextBox textBox) {
 
     return new TextRange(
       textBox.Document.ContentStart,
       textBox.Document.ContentEnd)
-      .Text;
+      .Text
+      .Replace("\r\n","\n")
+      .Replace('\r','\n')
+      .TrimEnd('\n');
   }
 }
